@@ -3,9 +3,10 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var cors = require('cors');
-var auth = require('./auth');
-var middleware = require('./middleware');
+var auth = require('./auth/auth');
+var middleware = require('./middleware/middleware');
 var User = require('./models/user');
+
 
 
 // Configuramos Express
@@ -36,7 +37,6 @@ router.get('/api/users', middleware.ensureAuthenticated, function (pet, resp) {
 // Rutas de autenticación y login
 router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
-router.get('/private', function (req, res) { resp.send("Todo bien") });
 
 router.route('/bears')
 
@@ -53,7 +53,7 @@ router.route('/bears')
   });
 
 // Ruta solo accesible si estás autenticado
-router.get('/private', middleware.ensureAuthenticated, function (req, res) { resp.send("Todo bien") });
+router.get('/private', middleware.ensureAuthenticated, function (req, res) { res.send("Todo bien") });
 const MongoClient = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://sergiojuliogu:sergiojuliogu@ds117935.mlab.com:17935/adi1718';
 
