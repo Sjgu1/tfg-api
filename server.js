@@ -65,7 +65,7 @@ MongoClient.connect(MONGO_URL, (err, db) => {
 
 
  // global.db = MongoClient.connect(MONGO_URL);
-  app.listen(3000, function() {
+  app.connect( function() {
     console.log("Node server running on http://localhost:3000");
   });
 })
