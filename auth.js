@@ -9,38 +9,42 @@ exports.emailSignup = function (req, res) {
     var user = new User({
         name: req.body.name,
         username: req.body.username,
-        password: req.body.password
+        password: req.body.password,
+        email : req.body.email
     });
-    console.log(db.collection('usuarios').count());
-    //db.collection('usuarios').find({"username": user.username}).count() == 
-
     db.collection('usuarios').findOne({ username: req.body.username }, function (err, doc) {
         if (doc) {
             res.send("Existe un usuario con el mismo nombre de usuario");
         } else {
             db.collection('usuarios').insert(user, function (err, user) {
-                if (err) return res.status(500).send("Error al crear un usuario");
-                res.status(200).jsonp(user);
+                if (err)
+                    return res.status(500).send("Error al crear un usuario");
+                res.status(200);
+                res.send({ token: service.createToken(user) });
             });
         }
     });
-
-
 };
 
 exports.emailLogin = function (req, res) {
     var obj = req.body;
-    console.log(req.body);
-    console.log("Peticion recibida: " + obj.user);
-    //console.log(User.findOne({username: obj.user}));
-    User.find(function (err, kittens) {
-        if (err) return console.error(err);
-        console.log(kittens);
-    })
-    User.findOne({ username: obj.user }, function (err, user) {
+    console.log(obj)   
+    if(req.body.email == null || req.body.password== null || req.body.email == "" || req.body.password == "") {
+        return res.status(400).send("mala peticion")
+    }
+ 
+    db.collection('usuarios').findOne({ email: req.body.email }, function (err, user) {
+        if (err)
+            return res.status(500).send("Error al recuperar los obejetos");
+        if (!user){
+            return res.status(500).send("No existe el usuario en la base de datos");
+        }
 
-        return res
-            .status(200)
-            .send({ token: service.createToken(user) });
+        if (obj.password == user.password) {
+            res.status(200);
+            res.send({ token: service.createToken(user) });
+        } else {
+            res.status(400).send("Contrasenya erronea");
+        }
     });
 };
