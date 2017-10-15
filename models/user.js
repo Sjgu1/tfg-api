@@ -1,10 +1,12 @@
-// grab the things we need
+//Importar lo que necesitamos
+'use strict';
 var mongoose = require('mongoose');
+var Project = require('./project');
+mongoose.model('Project');
 
 var Schema = mongoose.Schema;
 
-
-// create a schema
+//  Creacion del schema
 var userSchema = new Schema({
   name: String,
   surname: String,
@@ -12,6 +14,8 @@ var userSchema = new Schema({
   password: { type: String, required: true},
   email: { type: String, required: true, unique: true},
   admin: Boolean,
+  projects: [{type:mongoose.Schema.Types.ObjectId, ref: 'Project'}],
+  token: String,
   created_at: Date,
   updated_at: Date,
 });

@@ -3,10 +3,11 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var cors = require('cors');
-var auth = require('./auth/auth');
+var auth = require('./controllers/auth');
 var middleware = require('./middleware/middleware');
+var projectController = require('./controllers/projectController');
 var User = require('./models/user');
-
+var Project = require ('./models/project');
 
 
 // Configuramos Express
@@ -37,6 +38,8 @@ router.get('/api/users', middleware.ensureAuthenticated, function (pet, resp) {
 router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
 
+//Crear proyecto de usuario
+router.post('/user/:username/tablero', middleware.ensureAuthenticated, projectController.crearTablero);
 router.route('/bears')
 
 
@@ -52,7 +55,7 @@ router.route('/bears')
   });
 
 // Ruta solo accesible si estás autenticado
-router.get('/private', middleware.ensureAuthenticated, function (req, res) { res.send("Todo bien") });
+
 const MongoClient = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://sergiojuliogu:sergiojuliogu@ds117935.mlab.com:17935/adi1718';
 
@@ -60,7 +63,7 @@ MongoClient.connect(MONGO_URL, (err, db) => {
   if (err) {
     return console.log(err);
   }
-  global.db = (global.db ? global.db : mongoose.createConnection(MONGO_URL)); 
+  global.db = (global.db ? global.db : mongoose.createConnection(MONGO_URL, { useMongoClient: true })); 
 
 
  // global.db = MongoClient.connect(MONGO_URL);

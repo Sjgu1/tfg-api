@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 // create a schema
 var projectSchema = new Schema({
-  name: String,
+  name: { type: String, required: true},
   description: String,
   repository: String,
   init_date: Date,
@@ -15,6 +15,6 @@ var projectSchema = new Schema({
 });
 
 //Crear modelo de Proyecto
-var User = mongoose.model('Project', userSchema);
+var Project = mongoose.model('Project', projectSchema);
 //Hacerlo accesible desde la api
 module.exports = Project;
