@@ -38,8 +38,18 @@ router.get('/api/users', middleware.ensureAuthenticated, function (pet, resp) {
 router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
 
-//Crear proyecto de usuario
-router.post('/user/:username/tablero', middleware.ensureAuthenticated, projectController.crearTablero);
+/*****************Proyectos **************/
+//Crear proyecto
+router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
+//Listar proyectos de usuario. 
+router.get('/user/:username/project', middleware.ensureAuthenticated, projectController.getProjects);
+//Ver información de un proyecto en concreto. 
+router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.getProject);
+//Actualizar información de un proyecto en concreto. 
+router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.updateProject);
+//Borrar Proyecto
+router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.deleteProject);
+
 router.route('/bears')
 
 
