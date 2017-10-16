@@ -6,6 +6,7 @@ var cors = require('cors');
 var auth = require('./controllers/auth');
 var middleware = require('./middleware/middleware');
 var projectController = require('./controllers/projectController');
+var userController = require('./controllers/userController');
 var User = require('./models/user');
 var Project = require ('./models/project');
 
@@ -31,12 +32,12 @@ router.get('/api/users', middleware.ensureAuthenticated, function (pet, resp) {
 
   resp.send(array)
 })
-
-
-
 // Rutas de autenticación y login
 router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
+
+/*****************Usuarios **************/
+router.get('/user/:username', middleware.ensureAuthenticated, userController.getUser);
 
 /*****************Proyectos **************/
 //Crear proyecto
