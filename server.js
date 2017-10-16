@@ -37,7 +37,10 @@ router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
 
 /*****************Usuarios **************/
+//Mostrar usuario
 router.get('/user/:username', middleware.ensureAuthenticated, userController.getUser);
+//Actualizar datos de usuario
+router.put('/user/:username', middleware.ensureAuthenticated, userController.updateUser);
 
 /*****************Proyectos **************/
 //Crear proyecto

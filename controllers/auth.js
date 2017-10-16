@@ -38,7 +38,7 @@ exports.emailSignup = function (req, res) {
                         db.collection('users').insertOne(user, function (err, userCreado) {
                             if (err)
                                 res.status(500).send("Error al crear un usuario"); //Error al crear el usuario en la base de datos
-                            return res.status(200).send({ token: service.createToken(user), user: user }); //Todo ha ido bien, se agrega el usuario
+                            return res.status(200).send({ user: user }); //Todo ha ido bien, se agrega el usuario
                         });
                     }
                 });

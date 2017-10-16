@@ -213,5 +213,4 @@ exports.updateProject = function (req, res) {
             }
         });
     }
-
 }
