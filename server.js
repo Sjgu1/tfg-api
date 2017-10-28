@@ -62,6 +62,7 @@ router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticat
 const MongoClient = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://sergiojuliogu:sergiojuliogu@ds117935.mlab.com:17935/adi1718';
 
+
 MongoClient.connect(MONGO_URL, (err, db) => {  
   if (err) {
     return console.log(err);

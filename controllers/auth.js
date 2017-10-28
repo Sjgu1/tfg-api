@@ -5,7 +5,6 @@ var service = require('../service');
 var validator = require('validator');
 
 exports.emailSignup = function (req, res) {
-
     var obj = req.body;
     var user = new User({
         name: req.body.name,
@@ -17,28 +16,30 @@ exports.emailSignup = function (req, res) {
         created_at: new Date(),
         updated_at: new Date()
     });
-    //Se comprueba los campos obligatorios
-    if (validator.isEmpty(user.email) || validator.isEmpty(user.password) || validator.isEmpty(user.username)) {
-        res.status(500).send("Los campos username, password y email son obligatorios")
+    //Se comprueba los campos obligatorio
+    //console.log(user.body.email)
+    if (req.body.email == undefined || req.body.password == undefined || req.body.username == undefined) {
+        return res.status(400).send("Los campos username, password y email son obligatorios")
         //Se comprueba que el email sea válido
     } else if (!validator.isEmail(user.email)) {
-        res.status(500).send("Email incorrecto")
+        return res.status(400).send("Email incorrecto")
     } else {
         //Se comprueba que el username no se repite
         db.collection('users').findOne({ username: user.username }, function (err, doc) {
             if (doc) {
-                res.status(500).send("Existe un usuario con el mismo nombre de usuario");
+                return res.status(409).send("Existe un usuario con el mismo nombre de usuario");
                 //Se comprueba que el email no se repite
             } else {
                 db.collection('users').findOne({ email: user.email }, function (err, doc) {
                     if (doc) {
-                        res.status(500).send("El email ya existe en la base de datos");
+                        return res.status(409).send("El email ya existe en la base de datos");
                         //Se comprueba que el email no se repite
                     } else {
                         db.collection('users').insertOne(user, function (err, userCreado) {
                             if (err)
-                                res.status(500).send("Error al crear un usuario"); //Error al crear el usuario en la base de datos
-                            return res.status(200).send({ user: user }); //Todo ha ido bien, se agrega el usuario
+                                return res.status(500).send("Error al crear un usuario"); //Error al crear el usuario en la base de datos
+                                                          
+                            return res.status(201).send({ user: user }); //Todo ha ido bien, se agrega el usuario
                         });
                     }
                 });
@@ -67,8 +68,8 @@ exports.emailLogin = function (req, res) {
             db.collection('users').findOneAndUpdate( { email: req.body.email },  {$set :{ token: token , updated_at: new Date()}} , function (err, user) {
                 if (err)
                     return res.status(500).send("Error al guardar el token");
-                res.status(200);
-                res.send({ token: token });
+                return res.status(200)
+                    .send({ token: token });
             });
         } else {
             res.status(400).send("Contrasenya erronea");
