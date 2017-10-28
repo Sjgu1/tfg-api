@@ -11,8 +11,13 @@ exports.ensureAuthenticated = function(req, res, next) {
   }
   
   var token = req.headers.authorization;
-  var payload = jwt.decode(token, config.TOKEN_SECRET);
-  
+  try{
+    var payload = jwt.decode(token, config.TOKEN_SECRET);
+  }catch(e){
+    return res.status(400).send(e);
+  }
+ 
+
   if(payload.exp <= moment().unix()) {
      return res
      	.status(401)

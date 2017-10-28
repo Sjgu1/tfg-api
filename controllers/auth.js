@@ -55,7 +55,7 @@ exports.emailLogin = function (req, res) {
         return res.status(400).send("mala peticion")
     }
 
-    db.collection('users').findOne({ username: req.body.username }, function (err, user) {
+    db.collection('users').findOne({ email: req.body.email }, function (err, user) {
         if (err)
             return res.status(500).send("Error al recuperar los obejetos");
         if (!user) {

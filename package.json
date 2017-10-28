@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter nyan"
   },
   "author": "",
   "license": "ISC",
@@ -13,9 +13,11 @@
     "cors": "^2.8.4",
     "express": "^4.16.1",
     "jwt-simple": "^0.5.1",
+    "mocha": "^4.0.1",
     "moment": "^2.19.1",
     "mongodb": "^2.2.32",
     "mongoose": "^4.12.1",
+    "oauth": "^0.9.15",
     "validator": "^9.0.0"
   }
 }

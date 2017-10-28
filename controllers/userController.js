@@ -11,8 +11,8 @@ exports.getUser = function (req, res) {
         if (!doc) {
             res.status(500).send("No existe el usuario.");
             //se comprueba que el token del usuario que hace la peticion es el mismo que los datos del usuario que se piden
-        } else if (doc.token != req.headers.authorization) {
-            res.status(500).send("El token no corresponde al usuario logeado.");
+        /*} else if (doc.token != req.headers.authorization) {
+            res.status(500).send("El token no corresponde al usuario logeado.");*/
         } else {
             db.collection('users').findOne({ username: req.params.username }, { _id: 0, projects: 0, password: 0, admin: 0, token: 0 }, function (err2, user) {
                 if (err2)
@@ -29,8 +29,8 @@ exports.updateUser = function (req, res) {
         if (!usuarioActual) {
             res.status(500).send("No existe el usuario.");
             //se comprueba que el token del usuario que hace la peticion es el mismo que los datos del usuario que se piden
-        } else if (usuarioActual.token != req.headers.authorization) {
-            res.status(500).send("El token no corresponde al usuario logeado.");
+         /*} else if (doc.token != req.headers.authorization) {
+            res.status(500).send("El token no corresponde al usuario logeado.");*/
         } else {
             
             var user = new User({
@@ -75,8 +75,7 @@ exports.updateUser = function (req, res) {
                                             email: user.email,
                                             updated_at: new Date()
                                         }
-                                    }
-                                    
+                                    }                                  
                                     db.collection('users').findOneAndUpdate({ username: req.params.username }, datos_a_actualizar, function (err2, user) {
                                         if (err2)
                                             res.status(500).send(err2)

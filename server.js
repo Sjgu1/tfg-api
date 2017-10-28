@@ -47,26 +47,15 @@ router.put('/user/:username', middleware.ensureAuthenticated, userController.upd
 router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
 router.get('/user/:username/project', middleware.ensureAuthenticated, projectController.getProjects);
+//Listar los proyectos con paginado
+router.get('/user/:username/projects/:paginate', middleware.ensureAuthenticated, projectController.getPaginatedProjects);
+
 //Ver información de un proyecto en concreto. 
 router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.getProject);
 //Actualizar información de un proyecto en concreto. 
 router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.updateProject);
 //Borrar Proyecto
 router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.deleteProject);
-
-router.route('/bears')
-
-
-
-  // get all the bears (accessed at GET http://localhost:8080/api/bears)
-  .get(function (req, res) {
-    User.find(function (err, bears) {
-      if (err)
-        res.send(err);
-
-      res.json(bears);
-    });
-  });
 
 // Ruta solo accesible si estás autenticado
 
