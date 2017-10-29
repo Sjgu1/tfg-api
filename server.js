@@ -48,7 +48,7 @@ router.delete('/user/:username', middleware.ensureAuthenticated, userController.
 //Crear proyecto
 router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
-router.get('/user/:username/project', middleware.ensureAuthenticated, projectController.getProjects);
+router.get('/user/:username/projects', middleware.ensureAuthenticated, projectController.getProjects);
 //Listar los proyectos con paginado
 router.get('/user/:username/projects/:paginate', middleware.ensureAuthenticated, projectController.getPaginatedProjects);
 

@@ -86,7 +86,7 @@ exports.updateUser = function (req, res) {
                                     db.collection('users').findOneAndUpdate({ username: req.params.username }, datos_a_actualizar, function (err2, user) {
                                         if (err2)
                                             res.status(500).send(err2)
-                                            console.log(user);
+                                            //console.log(user);
                                         return res.status(204).send({user: user});
                                     })
                                 }

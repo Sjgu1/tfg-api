@@ -9,6 +9,8 @@ var should = chai.should();
 
 chai.use(chaiHttp);
 
+var idUsuario1
+var idUsuario2
 
 describe('Tests Registro y Login', function () {
     describe('Registrar usuario', function () {
@@ -59,6 +61,7 @@ describe('Tests Registro y Login', function () {
                     res.body.user.username.should.equal('user 1 test');
                     res.body.user.password.should.equal('password 1 test');
                     res.body.user.email.should.equal('user1test@gmail.com');
+                    idUsuario1 = res.body.user.username
                     done();
                 });
         });
@@ -82,8 +85,9 @@ describe('Tests Registro y Login', function () {
                     res.body.user.username.should.equal('user 2 test');
                     res.body.user.password.should.equal('password 2 test');
                     res.body.user.email.should.equal('user2test@gmail.com');
+                    idUsuario2 = res.body.user.username
                     done();
-                });
+                });              
         });
     });
     describe(' Logear al usuario', function () {

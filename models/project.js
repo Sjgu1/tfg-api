@@ -12,7 +12,6 @@ var projectSchema = new Schema({
   end_date: Date,
   stimated_end_date: Date,
   users: [{
-    permission: Number,
     user: {type:mongoose.Schema.Types.ObjectId, ref: 'User'},
   }],
   created_at: Date,
