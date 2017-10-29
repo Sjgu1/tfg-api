@@ -22,37 +22,34 @@ exports.newProject = function (req, res) {
     });
     //Se comprueba los campos obligatorios
 
-    if (validator.isEmpty(project.name)) {
-        res.status(500).send("Los campos name son obligatorios");
+    if (req.body.repository == undefined || req.body.name == undefined) {
+        res.status(400).send("Los campos name son obligatorios");
         //Se comprueba que el repositorio es una url
-    } else if (!validator.isEmpty(project.repository) && !validator.isURL(project.repository)) {
-        res.status(500).send("El repositorio tiene que ser una url valida")
+    } else if (!validator.isURL(req.body.repository)) {
+        res.status(400).send("El repositorio tiene que ser una url valida")
     } else {
         //Se comprueba que el usuario pasado por parametros existe
         // console.log(req.params.username);
         db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
             if (!doc) {
-                res.status(500).send("No existe el usuario.");
-
-                /* } else if (doc.token != req.headers.authorization) {
-                     res.status(500).send("El token no corresponde al usuario logeado."); */
+                res.status(404).send("No existe el usuario.");
             } else {
-                //console.log(doc);
                 var admin = {
                     user: doc._id
                 }
                 project.users.push(admin);
-                //console.log(project)
-                //project.users[0].permission= 0;
-                db.collection('projects').insertOne(project, function (err, projectoCreado) {
+
+                db.collection('projects').insertOne(project, function (err, proyectoCreado) {
                     if (err)
                         res.status(500).send("Error al crear el proyecto"); //Error al crear el usuario en la base de datos
                     else {
-                        db.collection('users').findOneAndUpdate({ username: req.params.username }, { $push: { projects: projectoCreado.ops[0] }, $set: { updated_at: new Date() } }, function (err, user) {
+                        db.collection('users').findOneAndUpdate({ username: req.params.username }, { $push: { projects: proyectoCreado.ops[0] }, $set: { updated_at: new Date() } }, function (err, user) {
                             if (err)
                                 return res.status(500).send("Error al linkear proyecto a usuario");
-                            res.status(200);
-                            res.send({ project: projectoCreado.ops, mensaje: "Se ha creado el projecto" });
+                            res.status(201);
+                            var loc = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + proyectoCreado.ops[0]._id
+                            res.setHeader('location' , loc);
+                            res.send(proyectoCreado.ops[0]);
                         });
                     }
                 });

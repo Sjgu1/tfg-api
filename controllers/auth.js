@@ -51,16 +51,15 @@ exports.emailSignup = function (req, res) {
 
 exports.emailLogin = function (req, res) {
     var obj = req.body;
-    console.log(obj)
     if (req.body.email == null || req.body.password == null || req.body.email == "" || req.body.password == "") {
-        return res.status(400).send("mala peticion")
+        return res.status(400).send("Los campos email y password son obligatorios")
     }
 
     db.collection('users').findOne({ email: req.body.email }, function (err, user) {
         if (err)
             return res.status(500).send("Error al recuperar los obejetos");
         if (!user) {
-            return res.status(500).send("No existe el usuario en la base de datos");
+            return res.status(401).send("No existe el usuario en la base de datos");
         }
 
         if (obj.password == user.password) {
@@ -68,11 +67,10 @@ exports.emailLogin = function (req, res) {
             db.collection('users').findOneAndUpdate( { email: req.body.email },  {$set :{ token: token , updated_at: new Date()}} , function (err, user) {
                 if (err)
                     return res.status(500).send("Error al guardar el token");
-                return res.status(200)
-                    .send({ token: token });
+                return res.status(200).send({ token: token });
             });
         } else {
-            res.status(400).send("Contrasenya erronea");
+            res.status(401).send("Contraseña erronea");
         }
     });
 };

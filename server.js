@@ -10,7 +10,6 @@ var userController = require('./controllers/userController');
 var User = require('./models/user');
 var Project = require ('./models/project');
 
-
 // Configuramos Express
 var app = express();
 app.use(bodyParser.json());
@@ -41,6 +40,9 @@ router.post('/auth/login', auth.emailLogin);
 router.get('/user/:username', middleware.ensureAuthenticated, userController.getUser);
 //Actualizar datos de usuario
 router.put('/user/:username', middleware.ensureAuthenticated, userController.updateUser);
+//Borrar usuario
+router.delete('/user/:username', middleware.ensureAuthenticated, userController.deleteUser);
+
 
 /*****************Proyectos **************/
 //Crear proyecto

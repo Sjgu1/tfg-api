@@ -27,3 +27,15 @@ exports.ensureAuthenticated = function(req, res, next) {
   req.user = payload.sub;
   next();
 }
+
+exports.comprobarToken = function(req, res, next){
+  db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
+    if (!doc) {
+        res.status(404).send("No existe el usuario.");
+        //se comprueba que el token del usuario que hace la peticion es el mismo que los datos del usuario que se piden
+    } else if (doc.token != req.headers.authorization) {
+        res.status(401).send("El token no corresponde al usuario logeado.");
+        next();
+    }
+  })
+}
