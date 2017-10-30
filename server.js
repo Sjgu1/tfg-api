@@ -74,6 +74,6 @@ MongoClient.connect(MONGO_URL, (err, db) => {
 
  // global.db = MongoClient.connect(MONGO_URL);
   app.listen(process.env.PORT || 5000, function() {
-    console.log("Node server running ");
+    console.log("Node server running in port 5000");
   });
 })

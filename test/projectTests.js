@@ -611,7 +611,16 @@ describe('Tests de proyectos', function () {
             
         })
     })
-    /*describe('Borrado de elementos creados', function () {
+    describe('Borrado de elementos creados', function () {
+        it('Se va comprobar que el token es correcto.', function (done) {
+            chai.request("http://localhost:5000")
+                .delete('/user/user1test/project/' + projectId2)
+                .set('Authorization', "failToken")
+                .end(function (err, res) {
+                    res.should.have.status(400);
+                    done();
+                });
+        })
         it('Se va a borrar el proyecto 2.', function (done) {
             chai.request("http://localhost:5000")
                 .delete('/user/user1test/project/' + projectId2)
@@ -658,5 +667,5 @@ describe('Tests de proyectos', function () {
                 });
         })
 
-    })*/
+    })
 });

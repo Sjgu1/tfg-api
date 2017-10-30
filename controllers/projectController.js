@@ -218,11 +218,9 @@ exports.deleteProject = function (req, res) {
                 var query = { _id: new ObjectId(req.params.idProject) };
                 db.collection('projects').findOne(query, function (err, pro) {
                     var participantes = []
-                    console.log(pro)
                     for (var i = 0; i < pro.users.length; i++) {
                         participantes[i] = pro.users[i].user._id
                     }
-                    console.log(participantes)
 
                     db.collection('projects').findOneAndDelete(query, function (err, proyectos) {
                         if (err)
