@@ -7,8 +7,12 @@ var auth = require('./controllers/auth');
 var middleware = require('./middleware/middleware');
 var projectController = require('./controllers/projectController');
 var userController = require('./controllers/userController');
+var permissionController = require('./controllers/permissionController');
+var roleController = require('./controllers/roleController');
 var User = require('./models/user');
 var Project = require ('./models/project');
+var Role = require('./models/role');
+var Permission = require('./models/permission');
 
 // Configuramos Express
 var app = express();
@@ -35,7 +39,7 @@ router.get('/api/users', middleware.ensureAuthenticated, function (pet, resp) {
 router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
 
-/*****************Usuarios **************/
+/***************** User **************/
 //Mostrar usuario
 router.get('/user/:username', middleware.ensureAuthenticated, userController.getUser);
 //Actualizar datos de usuario
@@ -44,7 +48,7 @@ router.put('/user/:username', middleware.ensureAuthenticated, userController.upd
 router.delete('/user/:username', middleware.ensureAuthenticated, userController.deleteUser);
 
 
-/*****************Proyectos **************/
+/***************** Project **************/
 //Crear proyecto
 router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
@@ -59,7 +63,37 @@ router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated,
 //Borrar Proyecto
 router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.deleteProject);
 
-// Ruta solo accesible si estás autenticado
+
+
+/***************** Permission **************/
+//Create
+router.post('/permission', middleware.ensureAuthenticated, permissionController.newPermission);
+//Read
+router.get('/permission/:name', middleware.ensureAuthenticated, permissionController.getPermission);
+router.get('/permission', middleware.ensureAuthenticated, permissionController.getPermissions);
+//Delete
+router.delete('/permission/:name', middleware.ensureAuthenticated, permissionController.deletePermission);
+
+
+
+/***************** Role **************/
+//router.post('/role', middleware.ensureAuthenticated, roleController.newRole);
+//Read
+//router.get('/role/:idRole', middleware.ensureAuthenticated, roleController.getRole);
+//router.get('/role', middleware.ensureAuthenticated, roleController.getRoles);
+//Delete
+//router.delete('/role/:idRole', middleware.ensureAuthenticated, roleController.deleteRole);
+
+
+/***************** **************/
+/***************** **************/
+/***************** **************/
+/***************** **************/
+/***************** **************/
+/***************** **************/
+/***************** **************/
+/***************** **************/
+
 
 const MongoClient = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://sergiojuliogu:sergiojuliogu@ds117935.mlab.com:17935/adi1718';

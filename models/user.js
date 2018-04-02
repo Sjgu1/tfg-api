@@ -13,9 +13,9 @@ var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true},
   email: { type: String, required: true, unique: true},
-  admin: Boolean,
   projects: [{type:mongoose.Schema.Types.ObjectId, ref: 'Project'}],
   token: String,
+  avatar: String,
   created_at: Date,
   updated_at: Date,
 });
