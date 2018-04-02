@@ -51,11 +51,11 @@ exports.emailSignup = function (req, res) {
 
 exports.emailLogin = function (req, res) {
     var obj = req.body;
-    if (req.body.email == null || req.body.password == null || req.body.email == "" || req.body.password == "") {
-        return res.status(400).send("Los campos email y password son obligatorios")
+    if (req.body.username == null || req.body.password == null || req.body.username == "" || req.body.password == "") {
+        return res.status(400).send("Los campos username y password son obligatorios")
     }
 
-    db.collection('users').findOne({ email: req.body.email }, function (err, user) {
+    db.collection('users').findOne({ username: req.body.username }, function (err, user) {
         if (err)
             return res.status(500).send("Error al recuperar los obejetos");
         if (!user) {
@@ -64,7 +64,7 @@ exports.emailLogin = function (req, res) {
 
         if (obj.password == user.password) {
             var token = service.createToken(user);
-            db.collection('users').findOneAndUpdate( { email: req.body.email },  {$set :{ token: token , updated_at: new Date()}} , function (err, user) {
+            db.collection('users').findOneAndUpdate( { username: req.body.username },  {$set :{ token: token , updated_at: new Date()}} , function (err, user) {
                 if (err)
                     return res.status(500).send("Error al guardar el token");
                 return res.status(200).send({ token: token });
