@@ -14,14 +14,15 @@
     "chai-http": "^3.0.0",
     "cors": "^2.8.4",
     "expect": "^21.2.1",
-    "express": "^4.16.1",
+    "express": "^4.16.3",
     "jwt-simple": "^0.5.1",
-    "mocha": "^4.0.1",
-    "moment": "^2.19.1",
-    "mongodb": "^2.2.32",
-    "mongoose": "^4.12.1",
+    "mocha": "^4.1.0",
+    "moment": "^2.22.0",
+    "mongodb": "^2.2.35",
+    "mongoose": "^4.13.12",
+    "mongoose-deep-populate": "^3.1.1",
     "oauth": "^0.9.15",
-    "request": "^2.83.0",
-    "validator": "^9.0.0"
+    "request": "^2.85.0",
+    "validator": "^9.4.1"
   }
 }

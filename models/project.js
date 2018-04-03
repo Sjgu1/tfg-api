@@ -1,6 +1,7 @@
 // grab the things we need
 var mongoose = require('mongoose');
 var User = require('./user');
+var Role = require('./role')
 var Schema = mongoose.Schema;
 
 // create a schema
@@ -8,11 +9,12 @@ var projectSchema = new Schema({
   name: { type: String, required: true},
   description: String,
   repository: String,
-  init_date: Date,
+  start_date: Date,
   end_date: Date,
-  stimated_end_date: Date,
+  estimated_end: Date,
   users: [{
     user: {type:mongoose.Schema.Types.ObjectId, ref: 'User'},
+    role: {type:mongoose.Schema.Types.ObjectId, ref: 'Role'},
   }],
   created_at: Date,
   updated_at: Date

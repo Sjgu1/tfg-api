@@ -4,18 +4,20 @@ var User = require('../models/user');
 var Project = require('../models/project');
 var service = require('../service');
 var validator = require('validator');
+var Permission = require('../models/permission')
 var ObjectId = require('mongoose').Types.ObjectId;
 
 
 exports.newProject = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
 
     var obj = req.body;
     var project = new Project({
         name: req.body.name,
         description: req.body.description,
         repository: req.body.repository,
-        init_date: req.body.init_date,
-        end_date: req.body.end_date,
+        start_date: req.body.start_date,
+        estimated_end: req.body.estimated_end,
         users: [],
         created_at: new Date(),
         updated_at: new Date()
@@ -34,29 +36,36 @@ exports.newProject = function (req, res) {
             if (!doc) {
                 res.status(404).send("No existe el usuario.");
             } else {
-                db.collection('projects').insertOne(project, function (err, proyectoCreado) {
-                    db.collection('projects').findOneAndUpdate({ _id: proyectoCreado.ops[0]._id }, { $push: { users: { user: doc } } }, function (err, probando) {
-                        if (err)
-                            res.status(500).send("Error al crear el proyecto");
-                        if (err)
-                            res.status(500).send("Error al crear el proyecto"); //Error al crear el usuario en la base de datos
-                        else {
-                            db.collection('users').findOneAndUpdate({ username: req.params.username }, { $push: { projects: proyectoCreado.ops[0] }, $set: { updated_at: new Date() } }, function (err, user) {
+                db.collection('roles').findOne({ name: "Admin" }, function (err, docRol) {
+                    if (!doc) {
+                        res.status(404).send("No existe el rol.");
+                    } else {
+                        db.collection('projects').insertOne(project, function (err, proyectoCreado) {
+                            ProjectModel.findOneAndUpdate({ _id: proyectoCreado.ops[0]._id }, { $push: { users: { user: doc, role: docRol } } }).populate("permissions").exec(function (err, probando) {
+                                console.log(docRol)
                                 if (err)
-                                    return res.status(500).send("Error al linkear proyecto a usuario");
-                                res.status(201);
-                                var loc = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + proyectoCreado.ops[0]._id
-                                res.setHeader('location', loc);
-                                res.send(probando.value);
+                                    res.status(500).send("Error al crear el proyecto");
+                                else {
+                                    db.collection('users').findOneAndUpdate({ username: req.params.username }, { $push: { projects: proyectoCreado.ops[0] }, $set: { updated_at: new Date() } }, function (err, user) {
+                                        if (err)
+                                            return res.status(500).send("Error al linkear proyecto a usuario");
+                                        res.status(201);
+                                        var loc = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + proyectoCreado.ops[0]._id
+                                        res.setHeader('location', loc);
+                                        res.send(probando.value);
+                                    });
+                                }
                             });
-                        }
-                    });
+                        })
+                    }
                 })
             }
         });
     }
 };
 exports.getProjects = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
+
     //Se comprueba que el usuario pasado por parametros existe en la base de datos
     db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
         if (!doc) {
@@ -77,17 +86,17 @@ exports.getProjects = function (req, res) {
                 "updated_at": 1,
                 "users.user.username": 1,
                 "users.user": 1,
+                "users.role": 1,
                 "description": 1,
-                "init_date": 1,
+                "start_date": 1,
                 "end_date": 1
             }
-            db.collection('projects').find(query, datoAmostrar).toArray(function (err, proyectos) {
-                var proyectosHypermedia;
-                for (var i = 0; i < proyectos.length; i++) {
-                    proyectos[i].linkHypermedia = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + proyectos[i]._id;
+            ProjectModel.find(query).populate(['users.role', 'users.user']).exec(function (err, proyectos) {
+                if (err) {
+                    console.log(err)
+                    res.status(500).send(err);
+
                 }
-                if (err)
-                    res.status(500).send("Error al conseguir los proyectos.");
                 else
                     res.status(200).send(proyectos);
             });
@@ -96,6 +105,7 @@ exports.getProjects = function (req, res) {
 
 };
 exports.getProject = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
 
     db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
         if (!doc) {
@@ -111,9 +121,12 @@ exports.getProject = function (req, res) {
             }
             if (pertenece) {
                 var query = { _id: new ObjectId(req.params.idProject) };
-                db.collection('projects').findOne(query, function (err, proyecto) {
-                    if (err)
+                ProjectModel.findOne(query).populate(['users.role', 'users.user']).populate('users.role.permissions.permiso').exec(function (err, proyecto) {
+                    if (err) {
+                        console.log(err)
                         res.status(500).send("Error al conseguir los proyectos.");
+
+                    }
                     else
                         res.status(200).send(proyecto);
                 });
@@ -123,82 +136,7 @@ exports.getProject = function (req, res) {
         }
     });
 }
-exports.getPaginatedProjects = function (req, res) {
 
-    db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
-        if (!doc) {
-            res.status(404).send("No existe el usuario.");
-        } else {
-            var proyectosDeUsuario = []
-            var otra = [];
-            for (var i = 0; i < doc.projects.length; i++) {
-                proyectosDeUsuario.push(doc.projects[i]._id)
-                otra[i] = new ObjectId(doc.projects[i]._id)
-            }
-            var pagination
-            var itemsPage
-            var page
-            try {
-                var pagination = req.params.paginate.split("&");
-                var itemsPage = pagination[0].split("=");
-                var page = pagination[1].split("=");
-            } catch (err) {
-                return res.status(400).send("Mal formato en la peticion")
-            }
-
-            if (itemsPage[0] != "items" || page[0] != "page") {
-                return res.status(400).send("Mal formato en la peticion")
-            }
-            var itemsPage = parseInt(itemsPage[1]);
-            var page = parseInt(page[1]);
-
-            var saltar = itemsPage * page;
-
-            var nextPage = "items=" + itemsPage + "&page=" + (page + 1);
-            var prevPage = "items=" + itemsPage + "&page=" + (page - 1);
-
-            if (page == 0)
-                prevPage = ""
-
-
-            if (saltar >= otra.length) {
-                nextPage = ""
-                saltar = otra.length - itemsPage
-            }
-
-            var query = { _id: { $in: proyectosDeUsuario } };
-            var datoAmostrar = {
-                "_id": 1,
-                "name": 1,
-                "repository": 1,
-                "created_at": 1,
-                "updated_at": 1,
-                "users.user.username": 1,
-                "users._id": 1,
-                "description": 1,
-                "init_date": 1,
-                "end_date": 1
-            }
-            db.collection('projects').find(query, datoAmostrar).skip(saltar).limit(itemsPage).toArray(function (err, proyectos) {
-                if (err)
-                    res.status(500).send("Error al conseguir los proyectos.");
-                else {
-                    for (var i = 0; i < proyectos.length; i++) {
-                        proyectos[i].linkHypermedia = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + proyectos[i]._id;
-                    }
-                    //console.log( nextPage)
-                    if (nextPage != "")
-                        nextPage = req.protocol + '://' + req.get('host') + "/user/" + req.params.username + "/projects/" + nextPage;
-                    if (prevPage != "")
-                        prevPage = req.protocol + '://' + req.get('host') + "/user/" + req.params.username + "/projects/" + prevPage;
-                    //console.log(nextPage)
-                    res.status(200).send({ projects: proyectos, nextPage: nextPage, prevPage: prevPage });
-                }
-            });
-        }
-    });
-
-};
 exports.deleteProject = function (req, res) {
 
     db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
@@ -255,11 +193,13 @@ exports.updateProject = function (req, res) {
             name: req.body.name,
             description: req.body.description,
             repository: req.body.repository,
-            init_date: req.body.init_date,
+            start_date: req.body.start_date,
+            estimated_end: req.body.estimated_end,
             end_date: req.body.end_date,
             updated_at: new Date(),
             users: {
-                user: req.body.users.user
+                user: req.body.users.user,
+                role: req.body.users.role
             }
         };
     } else {
@@ -268,8 +208,9 @@ exports.updateProject = function (req, res) {
             name: req.body.name,
             description: req.body.description,
             repository: req.body.repository,
-            init_date: req.body.init_date,
+            start_date: req.body.start_date,
             end_date: req.body.end_date,
+            estimated_end: req.body.estimated_end,
             updated_at: new Date(),
             users: {
                 user: ""
@@ -277,6 +218,7 @@ exports.updateProject = function (req, res) {
 
         };
     }
+    console.log(req.body)
     if (req.body.repository == undefined) {
         return res.status(400).send("El repositorio es obligatorio")
     } else if (!validator.isURL(req.body.repository)) {
@@ -300,69 +242,87 @@ exports.updateProject = function (req, res) {
                     db.collection('users').findOne({ username: project.users.user }, function (err, usuarioInvitado) {
                         if (!usuarioInvitado && agregarUsuario) {
                             res.status(404).send("No existe el usuario invitado.");
-                        } else {
-                            var participa = false;
-                            if (agregarUsuario) {
-                                for (var j = 0; j < usuarioInvitado.projects.length; j++) {
-                                    if (usuarioInvitado.projects[j]._id == req.params.idProject)
-                                        participa = true;
-                                }
+                        }
+                        db.collection('roles').findOne({ name: req.body.users.role }, function (err, role1) {
+                            console.log(role1)
+                            if (err) {
+                                return res.status(404).send("No existe el rol asignado");
                             }
-                            if (!participa) {
+                            if (role1 == null) {
+                                return res.status(404).send("No existe el rol asignado");
+                            }
+                            else {
+                                var participa = false;
+                                console.log(usuarioInvitado)
                                 if (agregarUsuario) {
-                                    var datos_a_actualizar = {
-                                        $push: {
-                                            users: {
-                                                user: usuarioInvitado
-                                            }
-                                        },
-                                        $set: {
-                                            name: project.name,
-                                            description: project.description,
-                                            repository: project.repository,
-                                            init_date: project.init_date,
-                                            end_date: project.end_date,
-                                            updated_at: new Date()
-                                        }
-                                    }
-                                } else {
-                                    var datos_a_actualizar = {
-                                        $set: {
-                                            name: project.name,
-                                            description: project.description,
-                                            repository: project.repository,
-                                            init_date: project.init_date,
-                                            end_date: project.end_date,
-                                            updated_at: new Date()
-                                        }
+                                    for (var j = 0; j < usuarioInvitado.projects.length; j++) {
+                                        if (usuarioInvitado.projects[j]._id == req.params.idProject)
+                                            participa = true;
                                     }
                                 }
-
-                                var query = { _id: new ObjectId(req.params.idProject) };
-
-                                db.collection('projects').findOneAndUpdate(query, datos_a_actualizar, function (err, proyecto) {
-                                    if (err) {
-                                        res.status(500).send("Error al conseguir los proyectos.");
+                                if (!participa) {
+                                    if (agregarUsuario) {
+                                        var datos_a_actualizar = {
+                                            $push: {
+                                                users: {
+                                                    user: usuarioInvitado,
+                                                    role: role1
+                                                }
+                                            },
+                                            $set: {
+                                                name: project.name,
+                                                description: project.description,
+                                                repository: project.repository,
+                                                start_date: project.start_date,
+                                                end_date: project.end_date,
+                                                updated_at: new Date()
+                                            }
+                                        }
                                     } else {
-                                        //console.log(proyecto)
-                                        if (agregarUsuario) {
-                                            db.collection('users').findOneAndUpdate({ username: usuarioInvitado.username }, { $push: { projects: proyecto.value }, $set: { updated_at: new Date() } }, function (err, user) {
-                                                if (err)
-                                                    return res.status(500).send("Error al linkear proyecto a usuario");
+                                        var datos_a_actualizar = {
+                                            $set: {
+                                                name: project.name,
+                                                description: project.description,
+                                                repository: project.repository,
+                                                start_date: project.start_date,
+                                                end_date: project.end_date,
+                                                updated_at: new Date()
+                                            }
+                                        }
+                                    }
+
+                                    var query = { _id: new ObjectId(req.params.idProject) };
+
+
+                                    db.collection('projects').findOneAndUpdate(query, datos_a_actualizar, function (err, proyecto) {
+                                        if (err) {
+                                            res.status(500).send("Error al conseguir los proyectos.");
+                                        }
+                                        if (proyecto == null) {
+                                            res.status(500).send("No existe el proyecto");
+                                        } else {
+
+                                            if (agregarUsuario) {
+                                                db.collection('users').findOneAndUpdate({ username: usuarioInvitado.username }, { $push: { projects: proyecto.value }, $set: { updated_at: new Date() } }, function (err, user) {
+                                                    if (err)
+                                                        return res.status(500).send("Error al linkear proyecto a usuario");
+                                                    res.status(204);
+                                                    res.send(proyecto);
+                                                });
+                                            } else {
                                                 res.status(204);
                                                 res.send(proyecto);
-                                            });
-                                        } else {
-                                            res.status(204);
-                                            res.send(proyecto);
+                                            }
                                         }
-                                    }
+                                    })
+
+
+                                } else {
+                                    return res.status(400).send("El usuario a agregar ya participa en el proyecto")
                                 }
-                                );
-                            } else {
-                                return res.status(400).send("El usuario a agregar ya participa en el proyecto")
+
                             }
-                        }
+                        });
                     })
                 } else {
                     return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")

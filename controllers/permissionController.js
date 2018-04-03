@@ -1,4 +1,4 @@
-// auth.js metodos de creacion y logear usuarios
+// permissionController.js
 var mongoose = require('mongoose');
 var Permission = require('../models/permission');
 var service = require('../service');
@@ -29,7 +29,7 @@ exports.newPermission = function (req, res) {
                     if (err)
                         return res.status(500).send("Error al crear el permiso"); //Error al crear el permiso en la base de datos
                                                   
-                    return res.status(201).send({ permission: permissionCreado }); //Todo ha ido bien, se agrega el usuario
+                    return res.status(201).send({ permission: permission }); //Todo ha ido bien, se agrega el usuario
                 });
             }
         });

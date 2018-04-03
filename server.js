@@ -52,9 +52,7 @@ router.delete('/user/:username', middleware.ensureAuthenticated, userController.
 //Crear proyecto
 router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
-router.get('/user/:username/projects', middleware.ensureAuthenticated, projectController.getProjects);
-//Listar los proyectos con paginado
-router.get('/user/:username/projects/:paginate', middleware.ensureAuthenticated, projectController.getPaginatedProjects);
+router.get('/user/:username/project', middleware.ensureAuthenticated, projectController.getProjects);
 
 //Ver información de un proyecto en concreto. 
 router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.getProject);
@@ -77,12 +75,13 @@ router.delete('/permission/:name', middleware.ensureAuthenticated, permissionCon
 
 
 /***************** Role **************/
-//router.post('/role', middleware.ensureAuthenticated, roleController.newRole);
+//Create
+router.post('/role', middleware.ensureAuthenticated, roleController.newRole);
 //Read
-//router.get('/role/:idRole', middleware.ensureAuthenticated, roleController.getRole);
-//router.get('/role', middleware.ensureAuthenticated, roleController.getRoles);
+router.get('/role/:name', middleware.ensureAuthenticated, roleController.getRole);
+router.get('/role', middleware.ensureAuthenticated, roleController.getRoles);
 //Delete
-//router.delete('/role/:idRole', middleware.ensureAuthenticated, roleController.deleteRole);
+router.delete('/role/:name', middleware.ensureAuthenticated, roleController.deleteRole);
 
 
 /***************** **************/
@@ -98,7 +97,7 @@ router.delete('/permission/:name', middleware.ensureAuthenticated, permissionCon
 const MongoClient = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://sergiojuliogu:sergiojuliogu@ds117935.mlab.com:17935/adi1718';
 
-
+mongoose.Promise = global.Promise;
 MongoClient.connect(MONGO_URL, (err, db) => {  
   if (err) {
     return console.log(err);

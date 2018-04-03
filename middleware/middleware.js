@@ -14,7 +14,7 @@ exports.ensureAuthenticated = function(req, res, next) {
   try{
     var payload = jwt.decode(token, config.TOKEN_SECRET);
   }catch(e){
-    return res.status(400).send(e);
+    return res.status(400).send("Token incorrecto");
   }
  
 

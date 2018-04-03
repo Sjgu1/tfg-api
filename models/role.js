@@ -9,7 +9,7 @@ var Schema = mongoose.Schema;
 var roleSchema = new Schema({
   name: { type: String, required: true, unique: true },
   description: String,
-  permissions: [{type:mongoose.Schema.Types.ObjectId, ref: 'Permission'}]
+  permissions: [{permiso: {type:mongoose.Schema.Types.ObjectId, ref: 'Permission'}}]
 });
 
 
