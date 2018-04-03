@@ -52,14 +52,14 @@ router.delete('/user/:username', middleware.ensureAuthenticated, userController.
 //Crear proyecto
 router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
-router.get('/user/:username/project', middleware.ensureAuthenticated, projectController.getProjects);
+router.get('/user/:username/project', middleware.ensureAuthenticated,  projectController.getProjects);
 
 //Ver información de un proyecto en concreto. 
-router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.getProject);
+router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoAdmin, projectController.getProject);
 //Actualizar información de un proyecto en concreto. 
-router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.updateProject);
+router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.updateProject);
 //Borrar Proyecto
-router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticated, projectController.deleteProject);
+router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.deleteProject);
 
 
 
