@@ -61,7 +61,7 @@ exports.getSprint = function (req, res) {
     var SprintModel = db.model('sprints', Sprint.schema)
 
 
-    ProjectModel.findOne({ _id: req.params.idProject }).exec( function (err, doc) {
+    ProjectModel.findOne({ _id: req.params.idProject }).exec(function (err, doc) {
         if (!doc) {
             res.status(404).send("No existe el proyecto.");
         } else {
@@ -91,51 +91,40 @@ exports.getSprint = function (req, res) {
 }
 
 exports.deleteSprint = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
+    var SprintModel = db.model('sprints', Sprint.schema)
 
-    db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
+    ProjectModel.findOne({ _id: req.params.idProject }).exec(function (err, doc) {
         if (!doc) {
-            res.status(404).send("No existe el usuario.");
+            res.status(404).send("No existe el proyecto.");
         } else {
 
-            var proyectosDeUsuario = []
+            var sprintsProyectos = []
             var otra = [];
             var pertenece = false;
-            for (var i = 0; i < doc.projects.length; i++) {
-                if (doc.projects[i]._id == req.params.idProject && !pertenece)
+            doc.sprints.forEach(sprint => {
+                if (sprint == req.params.idSprint && !pertenece)
                     pertenece = true;
-            }
-
-            if (pertenece) {
-                var query = { _id: new ObjectId(req.params.idProject) };
-                db.collection('projects').findOne(query, function (err, pro) {
-                    var participantes = []
-                    for (var i = 0; i < pro.users.length; i++) {
-                        participantes[i] = pro.users[i].user._id
+            })
+        }
+        if (pertenece) {
+            var query = { _id: new ObjectId(req.params.idSprint) };
+            db.collection('projects').findOne(query, function (err, pro) {
+                SprintModel.remove(query).exec(function (err, sprints) {
+                    if (err)
+                        return res.status(500).send("Error al conseguir el sprint.");
+                    else {
+                        ProjectModel.findOneAndUpdate({ _id: req.params.idProject }, { $pull: { 'sprints': ObjectId(req.params.idSprint) }, $set: { updated_at: new Date() } }).exec(function (err, doc) {
+                            if (err)
+                                return res.status(500).send("Error al actualizar los proyectos.");
+                            else
+                                return res.status(204).send("Se ha borrado el sprint");
+                        })
                     }
-
-                    db.collection('projects').findOneAndDelete(query, function (err, proyectos) {
-                        if (err)
-                            return res.status(500).send("Error al conseguir los proyectos.");
-                        else {
-                            for (var i = 0; i < participantes.length; i++) {
-                                var id = participantes[i]
-                                db.collection('users').findOneAndUpdate({ _id: id }, { $pull: { 'projects': { _id: new ObjectId(req.params.idProject) } }, $set: { updated_at: new Date() } }, function (err, doc) {
-                                    if (err)
-                                        return res.status(500).send("Error al conseguir los proyectos.");
-                                })
-                                db.collection('users').findOneAndUpdate({ username: req.params.username }, { $pull: { 'projects': { _id: new ObjectId(req.params.idProject) } }, $set: { updated_at: new Date() } }, function (err, doc) {
-                                    if (err)
-                                        return res.status(500).send("Error al conseguir los proyectos.");
-                                })
-                            }
-                            return res.status(204).send("Se ha borrado el proyecto");
-
-                        }
-                    });
-                })
-            } else {
-                return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
-            }
+                });
+            })
+        } else {
+            return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
         }
     });
 }
