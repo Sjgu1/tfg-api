@@ -92,7 +92,7 @@ exports.getProjects = function (req, res) {
                 "start_date": 1,
                 "end_date": 1
             }
-            ProjectModel.find(query).populate(['users.role', 'users.user']).exec(function (err, proyectos) {
+            ProjectModel.find(query).populate(['users.role', 'users.user', 'sprints']).exec(function (err, proyectos) {
                 if (err) {
                     res.status(500).send("No se han localizado los proyectos");
 
@@ -121,7 +121,7 @@ exports.getProject = function (req, res) {
             }
             if (pertenece) {
                 var query = { _id: new ObjectId(req.params.idProject) };
-                ProjectModel.findOne(query).populate(['users.role', 'users.user']).populate('users.role.permissions.permiso').exec(function (err, proyecto) {
+                ProjectModel.findOne(query).populate(['users.role', 'users.user', 'sprints']).populate('users.role.permissions.permiso').exec(function (err, proyecto) {
                     if (err) {
                         res.status(500).send("Error al conseguir los proyectos.");
 
