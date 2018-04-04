@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 var User = require('./user');
 var Role = require('./role')
+var Sprint = require('./sprint')
 var Schema = mongoose.Schema;
 
 // create a schema
@@ -16,6 +17,7 @@ var projectSchema = new Schema({
     user: {type:mongoose.Schema.Types.ObjectId, ref: 'User'},
     role: {type:mongoose.Schema.Types.ObjectId, ref: 'Role'},
   }],
+  sprints: [{type:mongoose.Schema.Types.ObjectId, ref: 'Sprint'}],
   created_at: Date,
   updated_at: Date
 });

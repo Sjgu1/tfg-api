@@ -56,19 +56,20 @@ exports.comprobarPermisoAdmin = function (req, res, next) {
       if (docProject._id == req.params.idProject) {
         ProjectModel.findOne({ _id: docProject._id }).populate(['users.user', 'users.role']).exec(function (err, doc2) {
           if (doc2 == null) {
-            return res.status(404).send("El usuario no existe")
-          }
-          doc2.users.forEach(userProject => {
-            if (userProject.user.username == req.params.username) {
-              if (userProject.role.name == "Admin") {
-                permisos = true;
-              }
-            }
-          });
-          if (permisos == true) {
-            next()
+            return res.status(404).send("El proyecto no existe")
           } else {
-            return res.status(404).send("Tu rol no te permite realizar esta accion")
+            doc2.users.forEach(userProject => {
+              if (userProject.user.username == req.params.username) {
+                if (userProject.role.name == "Admin") {
+                  permisos = true;
+                }
+              }
+            });
+            if (permisos == true) {
+              next()
+            } else {
+              return res.status(404).send("Tu rol no te permite realizar esta accion")
+            }
           }
         })
       }
@@ -89,19 +90,20 @@ exports.comprobarPermisoJefe = function (req, res, next) {
       if (docProject._id == req.params.idProject) {
         ProjectModel.findOne({ _id: docProject._id }).populate(['users.user', 'users.role']).exec(function (err, doc2) {
           if (doc2 == null) {
-            return res.status(404).send("El usuario no existe")
-          }
-          doc2.users.forEach(userProject => {
-            if (userProject.user.username == req.params.username) {
-              if (userProject.role.name == "Admin" || userProject.role.name == "Jefe") {
-                permisos = true;
-              }
-            }
-          });
-          if (permisos == true) {
-            next()
+            return res.status(404).send("El proyecto no existe")
           } else {
-            return res.status(404).send("Tu rol no te permite realizar esta accion")
+            doc2.users.forEach(userProject => {
+              if (userProject.user.username == req.params.username) {
+                if (userProject.role.name == "Admin" || userProject.role.name == "Jefe") {
+                  permisos = true;
+                }
+              }
+            });
+            if (permisos == true) {
+              next()
+            } else {
+              return res.status(404).send("Tu rol no te permite realizar esta accion")
+            }
           }
         })
       }
@@ -116,15 +118,16 @@ exports.participaProject = function (req, res, next) {
     var pertenece = false;
     if (doc == null) {
       return res.status(404).send("El usuario no existe")
-    }
-    for (var i = 0; i < doc.projects.length; i++) {
-      if (doc.projects[i]._id == req.params.idProject && !pertenece)
-        pertenece = true;
-    }
-    if (pertenece) {
-      next()
     } else {
-      return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
+      for (var i = 0; i < doc.projects.length; i++) {
+        if (doc.projects[i]._id == req.params.idProject && !pertenece)
+          pertenece = true;
+      }
+      if (pertenece) {
+        next()
+      } else {
+        return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
+      }
     }
   })
 }

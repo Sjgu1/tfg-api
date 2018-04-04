@@ -9,6 +9,7 @@ var projectController = require('./controllers/projectController');
 var userController = require('./controllers/userController');
 var permissionController = require('./controllers/permissionController');
 var roleController = require('./controllers/roleController');
+var sprintController = require('./controllers/sprintController');
 var User = require('./models/user');
 var Project = require ('./models/project');
 var Role = require('./models/role');
@@ -53,8 +54,6 @@ router.delete('/user/:username', middleware.ensureAuthenticated, userController.
 router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
 router.get('/user/:username/project', middleware.ensureAuthenticated,  projectController.getProjects);
-
-//Ver información de un proyecto en concreto. 
 router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoAdmin, projectController.getProject);
 //Actualizar información de un proyecto en concreto. 
 router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.updateProject);
@@ -84,7 +83,18 @@ router.get('/role', middleware.ensureAuthenticated, roleController.getRoles);
 router.delete('/role/:name', middleware.ensureAuthenticated, roleController.deleteRole);
 
 
-/***************** **************/
+/***************** Sprint **************/
+//Crear sprint
+router.post('/user/:username/project/:idProject/sprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.newSprint);
+//Listar sprints de proyecto. 
+router.get('/user/:username/project/:idProject/sprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprints);
+router.get('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprint);
+//Actualizar información de un proyecto en concreto. 
+router.put('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.updateSprint);
+//Borrar Proyecto
+router.delete('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.deleteSprint);
+
+
 /***************** **************/
 /***************** **************/
 /***************** **************/

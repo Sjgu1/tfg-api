@@ -1,4 +1,4 @@
-// auth.js metodos de creacion y logear usuarios
+// project.js
 var mongoose = require('mongoose');
 var User = require('../models/user');
 var Project = require('../models/project');
@@ -20,6 +20,7 @@ exports.newProject = function (req, res) {
         start_date: req.body.start_date,
         estimated_end: req.body.estimated_end,
         users: [],
+        sprints:[],
         created_at: new Date(),
         updated_at: new Date()
     });
