@@ -40,7 +40,7 @@ exports.newStatus = function (req, res) {
 };
 exports.getAllStatus = function (req, res) {
     var SprintModel = db.model('sprints', Sprint.schema)
-    SprintModel.find({ project: req.params.idProject }).populate('tasks').exec(function (err, sprints) {
+    SprintModel.find({ _id: req.params.idSprint }).populate(['status']).exec(function (err, sprints) {
         if (err) {
             res.status(500).send("No se han localizado los proyectos");
 
@@ -72,7 +72,7 @@ exports.getStatus = function (req, res) {
         }
         if (pertenece) {
             var query = { _id: new ObjectId(req.params.idStatus) };
-            StatusModel.findOne(query).populate('tasks').exec(function (err, estadoEncontrado) {
+            StatusModel.findOne(query).populate(['status','tasks']).exec(function (err, estadoEncontrado) {
                 if (err) {
                     res.status(500).send("Error al conseguir los estados.");
                 }

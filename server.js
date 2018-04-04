@@ -110,10 +110,10 @@ router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus
 //Crear tasl
 router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.newTask);
 //Listar sprints de proyecto. 
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.getTasks);
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.getTask);
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTasks);
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTask);
 //Actualizar información de un proyecto en concreto. 
-router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.updateTask);
+router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject,taskController.updateTask);
 //Borrar Proyecto
 router.delete('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.deleteTask);
 
