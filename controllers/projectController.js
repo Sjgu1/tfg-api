@@ -64,7 +64,6 @@ exports.newProject = function (req, res) {
     }
 };
 exports.getProjects = function (req, res) {
-    console.log("probando")
     var ProjectModel = db.model('projects', Project.schema)
 
     //Se comprueba que el usuario pasado por parametros existe en la base de datos
@@ -257,12 +256,16 @@ exports.updateProject = function (req, res) {
                     count += 1
                 })
                 if (participa == true) {
-                    ProjectModel.updateOne({ '_id': req.params.idProject }, { $pull: { 'users': { $elemMatch: { user: ObjectId(user._id) } } } }).exec(function (err, projectUpdated) {
+                    ProjectModel.updateOne({ '_id': req.params.idProject }, { $pull: { 'users': { user: ObjectId(user._id) } } }).exec(function (err, projectUpdated) {
                         if (err)
                             return res.status(500).send("Error de la base de datos")
                         else {
-                            return res.status(204).send(projectUpdated)
-
+                            UserModel.updateOne({ '_id': ObjectId(user._id) }, { $pull: { 'projects': { _id: ObjectId(req.params.idProject) } } }).exec(function (err, projectUpdated) {
+                                if (err)
+                                    return res.status(500).send("Error de la base de datos")
+                                else
+                                    return res.status(204).send(projectUpdated)
+                            })
                         }
                     })
 
@@ -377,8 +380,6 @@ exports.updateProject = function (req, res) {
                                         }
 
                                         var query = { _id: new ObjectId(req.params.idProject) };
-                                        console.log(query)
-
 
                                         db.collection('projects').findOneAndUpdate(query, datos_a_actualizar, function (err, proyecto) {
                                             if (err) {
