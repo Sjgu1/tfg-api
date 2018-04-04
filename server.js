@@ -98,11 +98,11 @@ const MongoClient = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://sergiojuliogu:sergiojuliogu@ds117935.mlab.com:17935/adi1718';
 
 mongoose.Promise = global.Promise;
-MongoClient.connect(MONGO_URL, (err, db) => {  
+mongoose.connect(MONGO_URL, (err, db) => {  
   if (err) {
     return console.log(err);
   }
-  global.db = (global.db ? global.db : mongoose.createConnection(MONGO_URL, { useMongoClient: true })); 
+  global.db = (global.db ? global.db : mongoose.createConnection(MONGO_URL)); 
 
 
  // global.db = MongoClient.connect(MONGO_URL);

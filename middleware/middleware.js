@@ -61,7 +61,6 @@ exports.comprobarPermisoAdmin = function (req, res, next) {
           doc2.users.forEach(userProject => {
             if (userProject.user.username == req.params.username) {
               if (userProject.role.name == "Admin") {
-                console.log("venga")
                 permisos = true;
               }
             }
