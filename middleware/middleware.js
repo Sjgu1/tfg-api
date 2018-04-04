@@ -66,7 +66,6 @@ exports.comprobarPermisoAdmin = function (req, res, next) {
               }
             }
           });
-          console.log(permisos)
           if (permisos == true) {
             next()
           } else {
