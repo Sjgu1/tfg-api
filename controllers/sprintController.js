@@ -22,6 +22,7 @@ exports.newSprint = function (req, res) {
         start_date: req.body.start_date,
         estimated_end: req.body.estimated_end,
         project: ObjectId(req.params.idProject),
+        status: [],
         created_at: new Date(),
         updated_at: new Date()
     });
@@ -44,7 +45,7 @@ exports.newSprint = function (req, res) {
 };
 exports.getSprints = function (req, res) {
     var SprintModel = db.model('sprints', Sprint.schema)
-    SprintModel.find({ project: req.params.idProject }).populate('project.name').exec(function (err, sprints) {
+    SprintModel.find({ project: req.params.idProject }).populate(['project.name', 'status']).exec(function (err, sprints) {
         if (err) {
             res.status(500).send("No se han localizado los proyectos");
 
@@ -76,7 +77,7 @@ exports.getSprint = function (req, res) {
         }
         if (pertenece) {
             var query = { _id: new ObjectId(req.params.idSprint) };
-            SprintModel.findOne(query).populate('project.name').exec(function (err, sprint) {
+            SprintModel.findOne(query).populate(['project.name', 'status']).exec(function (err, sprint) {
                 if (err) {
                     res.status(500).send("Error al conseguir los Sprints.");
 

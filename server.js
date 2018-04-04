@@ -10,10 +10,12 @@ var userController = require('./controllers/userController');
 var permissionController = require('./controllers/permissionController');
 var roleController = require('./controllers/roleController');
 var sprintController = require('./controllers/sprintController');
+var statusController = require('./controllers/statusController');
 var User = require('./models/user');
 var Project = require ('./models/project');
 var Role = require('./models/role');
 var Permission = require('./models/permission');
+var taskController = require('./controllers/taskController');
 
 // Configuramos Express
 var app = express();
@@ -95,8 +97,26 @@ router.put('/user/:username/project/:idProject/sprint/:idSprint', middleware.ens
 router.delete('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.deleteSprint);
 
 
-/***************** **************/
-/***************** **************/
+/***************** Status **************/
+//Crear status
+router.post('/user/:username/project/:idProject/sprint/:idSprint/status', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.newStatus);
+//Listar status de proyecto. 
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getAllStatus);
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getStatus);
+//Actualizar información de un status en concreto. 
+router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.updateStatus);
+
+/***************** Task **************/
+//Crear tasl
+router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.newTask);
+//Listar sprints de proyecto. 
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.getTasks);
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.getTask);
+//Actualizar información de un proyecto en concreto. 
+router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.updateTask);
+//Borrar Proyecto
+router.delete('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.deleteTask);
+
 /***************** **************/
 /***************** **************/
 /***************** **************/
