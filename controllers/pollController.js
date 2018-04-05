@@ -26,7 +26,7 @@ exports.newPoll = function (req, res) {
     });
 
     //Se comprueba los campos obligatorios
-    if (req.body.end_date == undefined) {
+    if (req.body.end_date == undefined ) {
         res.status(400).send("El campo end_date es obligatorio");
         //Se comprueba que el repositorio es una url
     } else {
@@ -43,7 +43,7 @@ exports.newPoll = function (req, res) {
                         if (err)
                             res.status(500).send("Error al crear la votación");
                         else {
-                            res.status(201).send(taskActualizada)
+                            res.status(201).send(pollCreada.ops[0]._id)
                         }
                     });
                 })
@@ -55,8 +55,7 @@ exports.newPoll = function (req, res) {
 
 exports.getPoll = function (req, res) {
     var TaskModel = db.model('tasks', Task.schema)
-
-
+    var PollModel = db.model('polls', Poll.schema)
 
     TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
         if (err) {
@@ -64,8 +63,8 @@ exports.getPoll = function (req, res) {
         } else if (doc == null) {
             res.status(404).send("No existe la tarea")
         } else {
-            var query = { _id: new ObjectId(req.params.idTask) };
-            TaskModel.findOne(query).populate(['poll']).exec(function (err, pollEncontrada) {
+            var query = { _id: new ObjectId(req.params.idPoll) };
+            PollModel.findOne(query).populate('votes').exec(function (err, pollEncontrada) {
                 if (err) {
                     res.status(500).send("Error al conseguir la votación.");
                 }else if(pollEncontrada == null){
