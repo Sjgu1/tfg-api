@@ -17,6 +17,8 @@ exports.newVote = function (req, res) {
     var PollModel = db.model('polls', Poll.schema)
     var UserModel = db.model('users', User.schema)
     var VoteModel = db.model('votes', Vote.schema)
+    var TaskModel = db.model('tasks', Task.schema)
+
 
     var vote = new Vote({
         value: req.body.value,
@@ -54,7 +56,19 @@ exports.newVote = function (req, res) {
                                     if (err)
                                         res.status(500).send("Error al crear el voto");
                                     else {
-                                        res.status(201).send(pollActualizada)
+                                        var change = new Change({
+                                            message: "El usuario " + req.params.username + " ha votado la tarea con una puntuación de " + req.body.value + " de dificultad.",
+                                            created_at: new Date()
+                                        });
+                                        db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                            TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                                if (err)
+                                                    res.status(500).send("Error al crear la tarea");
+                                                else {
+                                                    res.status(204).send(pollActualizada);
+                                                }
+                                            });
+                                        })
                                     }
                                 });
                             })
@@ -132,9 +146,21 @@ exports.updateVote = function (req, res) {
                         res.status(500).send("Error al conseguir el voto.");
                     } else if (voteActualizado == null) {
                         res.status(404).send("No se ha encontrado el voto");
+                    } else {
+                        var change = new Change({
+                            message: "El usuario " + req.params.username + " ha cambiado su voto de " + voteActualizado.value + " a " + req.body.value + ".",
+                            created_at: new Date()
+                        });
+                        db.collection('changes').insertOne(change, function (err, changeCreado) {
+                            TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                if (err)
+                                    res.status(500).send("Error al crear la tarea");
+                                else {
+                                    res.status(204).send(voteActualizado);
+                                }
+                            });
+                        })
                     }
-                    else
-                        res.status(204).send(voteActualizado);
                 });
             }
         })
@@ -159,7 +185,19 @@ exports.deleteVote = function (req, res) {
                     res.status(500).send("Error al conseguir el voto.");
                 } else {
 
-                    res.status(201).send("Borrado");
+                    var change = new Change({
+                        message: "El usuario " + req.params.username + " ha borrado su voto.",
+                        created_at: new Date()
+                    });
+                    db.collection('changes').insertOne(change, function (err, changeCreado) {
+                        TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                            if (err)
+                                res.status(500).send("Error al crear la tarea");
+                            else {
+                                res.status(201).send("Borrado");
+                            }
+                        });
+                    })
                 }
             });
         }

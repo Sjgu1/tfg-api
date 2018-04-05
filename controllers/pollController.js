@@ -26,7 +26,7 @@ exports.newPoll = function (req, res) {
     });
 
     //Se comprueba los campos obligatorios
-    if (req.body.end_date == undefined ) {
+    if (req.body.end_date == undefined) {
         res.status(400).send("El campo end_date es obligatorio");
         //Se comprueba que el repositorio es una url
     } else {
@@ -43,7 +43,19 @@ exports.newPoll = function (req, res) {
                         if (err)
                             res.status(500).send("Error al crear la votación");
                         else {
-                            res.status(201).send(pollCreada.ops[0]._id)
+                            var change = new Change({
+                                message: "El usuario " + req.params.username + " ha comenzado una votación que finaliza en " + req.body.end_date + ".",
+                                created_at: new Date()
+                            });
+                            db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                    if (err)
+                                        res.status(500).send("Error al crear la tarea");
+                                    else {
+                                        res.status(201).send(pollCreada.ops[0]._id)
+                                    }
+                                });
+                            })
                         }
                     });
                 })
@@ -67,7 +79,7 @@ exports.getPoll = function (req, res) {
             PollModel.findOne(query).populate('votes').exec(function (err, pollEncontrada) {
                 if (err) {
                     res.status(500).send("Error al conseguir la votación.");
-                }else if(pollEncontrada == null){
+                } else if (pollEncontrada == null) {
                     res.status(404).send("No se ha encontrado la votación");
                 }
                 else
@@ -85,7 +97,7 @@ exports.updatePoll = function (req, res) {
 
     if (req.body.end_date == undefined) {
         res.status(400).send("El campo end_date es obligatorio");
-    }else{
+    } else {
         TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
             if (err) {
                 res.status(500).send("Error al encontrar la tarea")
@@ -93,14 +105,26 @@ exports.updatePoll = function (req, res) {
                 res.status(404).send("No existe la tarea")
             } else {
                 var query = { _id: new ObjectId(req.params.idPoll) };
-                PollModel.findOneAndUpdate(query, {  $set: { updated_at: new Date() , end_date: req.body.end_date} }, function (err, pollActualizada) {
+                PollModel.findOneAndUpdate(query, { $set: { updated_at: new Date(), end_date: req.body.end_date } }, function (err, pollActualizada) {
                     if (err) {
                         res.status(500).send("Error al conseguir la votación.");
-                    }else if(pollActualizada == null){
+                    } else if (pollActualizada == null) {
                         res.status(404).send("No se ha encontrado la votación");
+                    } else {
+                        var change = new Change({
+                            message: "El usuario " + req.params.username + " ha cambiado la fecha de fin de la votación de " + pollActualizada.end_date + " a " + req.body.end_date + ".",
+                            created_at: new Date()
+                        });
+                        db.collection('changes').insertOne(change, function (err, changeCreado) {
+                            TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                if (err)
+                                    res.status(500).send("Error al crear la tarea");
+                                else {
+                                    res.status(204).send(pollActualizada);
+                                }
+                            });
+                        })
                     }
-                    else
-                        res.status(204).send(pollActualizada);
                 });
             }
         })
@@ -118,15 +142,27 @@ exports.deletePoll = function (req, res) {
             res.status(404).send("No existe la tarea")
         } else {
             var query = { _id: new ObjectId(req.params.idPoll) };
-            PollModel.remove(query , function (err, pollActualizada) {
+            PollModel.remove(query, function (err, pollActualizada) {
                 if (err) {
                     res.status(500).send("Error al conseguir la votación.");
-                }else{
+                } else {
                     TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $set: { poll: null, updated_at: new Date() } }).exec(function (err, taskActualizada) {
                         if (err)
                             res.status(500).send("Error al actualizar la tarea");
                         else {
-                            res.status(201).send("Borrado");
+                            var change = new Change({
+                                message: "El usuario " + req.params.username + " ha eliminado la votación.",
+                                created_at: new Date()
+                            });
+                            db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                    if (err)
+                                        res.status(500).send("Error al crear la tarea");
+                                    else {
+                                        res.status(201).send("Borrado");
+                                    }
+                                });
+                            })
                         }
                     });
                 }
