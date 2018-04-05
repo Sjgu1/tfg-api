@@ -23,6 +23,7 @@ exports.newTask = function (req, res) {
         estimated_end: req.body.estimated_end,
         color: req.body.color,
         users: [],
+        changes: [],
         created_at: new Date(),
         updated_at: new Date()
     });
@@ -80,7 +81,7 @@ exports.getTask = function (req, res) {
         }
         if (pertenece) {
             var query = { _id: new ObjectId(req.params.idTask) };
-            TaskModel.findOne(query).populate('users').exec(function (err, taskEncontrada) {
+            TaskModel.findOne(query).populate(['users', 'changes']).exec(function (err, taskEncontrada) {
                 if (err) {
                     res.status(500).send("Error al conseguir la tarea.");
                 }

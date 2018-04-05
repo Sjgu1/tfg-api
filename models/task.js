@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var User = require('./user');
 var Status = require('./status')
+var Change = require('./change')
 
 
 // create a schema
@@ -14,6 +15,7 @@ var taskSchema = new Schema({
   users: [{type:mongoose.Schema.Types.ObjectId, ref: 'User'}],
   status: {type:mongoose.Schema.Types.ObjectId, ref: 'Status'},
   color: String,
+  changes: [{type:mongoose.Schema.Types.ObjectId, ref: 'Change'}],
   created_at: Date,
   updated_at: Date
 });
