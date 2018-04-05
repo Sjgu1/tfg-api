@@ -127,7 +127,7 @@ exports.updateTask = function (req, res) {
                                 } else {
                                     var participa = false;
                                     taskEncontrada.users.forEach(user => {
-                                        if (JSON.stringify(user) === JSON.stringify(userEncontrado._id) )
+                                        if (JSON.stringify(user) === JSON.stringify(userEncontrado._id))
                                             participa = true
                                     })
 
@@ -256,38 +256,33 @@ exports.updateTask = function (req, res) {
 exports.deleteTask = function (req, res) {
     var ProjectModel = db.model('projects', Project.schema)
     var SprintModel = db.model('sprints', Sprint.schema)
+    var TaskModel = db.model('tasks', Task.schema)
+    var StatusModel = db.model('status', Status.schema)
 
-    ProjectModel.findOne({ _id: req.params.idProject }).exec(function (err, doc) {
+    StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, doc) {
         if (!doc) {
-            res.status(404).send("No existe el proyecto.");
+            res.status(404).send("No existe el status.");
         } else {
 
-            var sprintsProyectos = []
+            var tasksStatus = []
             var otra = [];
             var pertenece = false;
-            doc.sprints.forEach(sprint => {
-                if (sprint == req.params.idSprint && !pertenece)
+            doc.tasks.forEach(task => {
+                if (task == req.params.idTask && !pertenece)
                     pertenece = true;
             })
         }
         if (pertenece) {
-            var query = { _id: new ObjectId(req.params.idSprint) };
-            db.collection('projects').findOne(query, function (err, pro) {
-                SprintModel.remove(query).exec(function (err, sprints) {
-                    if (err)
-                        return res.status(500).send("Error al conseguir el sprint.");
-                    else {
-                        ProjectModel.findOneAndUpdate({ _id: req.params.idProject }, { $pull: { 'sprints': ObjectId(req.params.idSprint) }, $set: { updated_at: new Date() } }).exec(function (err, doc) {
-                            if (err)
-                                return res.status(500).send("Error al actualizar los proyectos.");
-                            else
-                                return res.status(204).send("Se ha borrado el sprint");
-                        })
-                    }
-                });
-            })
+            var query = { _id: new ObjectId(req.params.idTask) };
+            TaskModel.remove(query).exec(function (err, tasks) {
+                if (err)
+                    return res.status(500).send("Error al conseguir el sprint.");
+                else {
+                   return res.status(201).send("borrado")
+                }
+            });
         } else {
-            return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
+            return res.status(404).send("La tarea o no existe o no tiene acceso el usuario conectado")
         }
     });
 }

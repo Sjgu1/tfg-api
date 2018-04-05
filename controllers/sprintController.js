@@ -110,20 +110,18 @@ exports.deleteSprint = function (req, res) {
         }
         if (pertenece) {
             var query = { _id: new ObjectId(req.params.idSprint) };
-            db.collection('projects').findOne(query, function (err, pro) {
-                SprintModel.remove(query).exec(function (err, sprints) {
-                    if (err)
-                        return res.status(500).send("Error al conseguir el sprint.");
-                    else {
-                        ProjectModel.findOneAndUpdate({ _id: req.params.idProject }, { $pull: { 'sprints': ObjectId(req.params.idSprint) }, $set: { updated_at: new Date() } }).exec(function (err, doc) {
-                            if (err)
-                                return res.status(500).send("Error al actualizar los proyectos.");
-                            else
-                                return res.status(204).send("Se ha borrado el sprint");
-                        })
-                    }
-                });
-            })
+            SprintModel.remove(query).exec(function (err, sprints) {
+                if (err)
+                    return res.status(500).send("Error al conseguir el sprint.");
+                else {
+                    ProjectModel.findOneAndUpdate({ _id: req.params.idProject }, { $pull: { 'sprints': ObjectId(req.params.idSprint) }, $set: { updated_at: new Date() } }).exec(function (err, doc) {
+                        if (err)
+                            return res.status(500).send("Error al actualizar los proyectos.");
+                        else
+                            return res.status(204).send("Se ha borrado el sprint");
+                    })
+                }
+            });
         } else {
             return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
         }
@@ -161,10 +159,10 @@ exports.updateSprint = function (req, res) {
 
                 if (pertenece) {
 
-                    SprintModel.findOneAndUpdate({ _id: req.params.idSprint }, datos_a_actualizar).exec(function (err, sprintActualizado){
-                        if(err){
+                    SprintModel.findOneAndUpdate({ _id: req.params.idSprint }, datos_a_actualizar).exec(function (err, sprintActualizado) {
+                        if (err) {
                             return res.status(500).send("Error al actualizar el sprint.");
-                        }else{
+                        } else {
                             return res.status(204).send("actualizado")
                         }
                     })
