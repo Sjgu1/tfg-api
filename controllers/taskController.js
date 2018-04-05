@@ -9,6 +9,8 @@ var Sprint = require('../models/sprint')
 var ObjectId = require('mongoose').Types.ObjectId;
 var Status = require('../models/status');
 var Task = require('../models/task');
+var Change = require('../models/change');
+
 exports.newTask = function (req, res) {
     var ProjectModel = db.model('projects', Project.schema)
     var SprintModel = db.model('sprints', Sprint.schema)
@@ -140,7 +142,20 @@ exports.updateTask = function (req, res) {
                                             if (err) {
                                                 res.status(500).send("Error al actualizar la tarea")
                                             } else {
-                                                res.status(204).send("")
+                                                var change = new Change({
+                                                    message: req.params.username + " ha asigando al usuario " + userEncontrado.username + " a la tarea.",
+                                                    created_at: new Date()
+                                                });
+                                                db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                                        if (err)
+                                                            res.status(500).send("Error al crear la tarea");
+                                                        else {
+                                                            res.status(204).send(taskActualizada)
+                                                        }
+                                                    });
+                                                })
+
                                             }
                                         })
 
@@ -195,7 +210,19 @@ exports.updateTask = function (req, res) {
                                             if (err) {
                                                 res.status(500).send("Error al actualizar la tarea")
                                             } else {
-                                                res.status(204).send("Usuario eliminado usuario")
+                                                var change = new Change({
+                                                    message: req.params.username + " ha eliminado al usuario " + userEncontrado.username + " de la tarea.",
+                                                    created_at: new Date()
+                                                });
+                                                db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                                        if (err)
+                                                            res.status(500).send("Error al crear la tarea");
+                                                        else {
+                                                            res.status(204).send("Usuario eliminado usuario")
+                                                        }
+                                                    });
+                                                })
                                             }
                                         })
 
@@ -213,14 +240,14 @@ exports.updateTask = function (req, res) {
         });
 
     } else if (req.body.operation == "cambiarEstado") {
-        StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, doc) {
-            if (!doc) {
+        StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, docStatus) {
+            if (!docStatus) {
                 res.status(404).send("No existe el status.");
             } else {
                 var statusTasks = []
                 var otra = [];
                 var pertenece = false;
-                doc.tasks.forEach(task1 => {
+                docStatus.tasks.forEach(task1 => {
                     if (task1 == req.params.idTask && !pertenece)
                         pertenece = true;
                 })
@@ -242,7 +269,7 @@ exports.updateTask = function (req, res) {
                                         if (err) {
                                             res.status(500).send("Error al actualizar la tarea")
                                         } else {
-                                            StatusModel.update({ _id: req.params.idStatus }, { $pull: { 'tasks': req.params.idTask  }}).exec( function (err, doc) {
+                                            StatusModel.update({ _id: req.params.idStatus }, { $pull: { 'tasks': req.params.idTask } }).exec(function (err, doc) {
                                                 if (err) {
                                                     res.status(500).send("Error al eliminar tarea del status")
                                                 } else {
@@ -250,7 +277,19 @@ exports.updateTask = function (req, res) {
                                                         if (err) {
                                                             res.status(500).send("Error al agregar tarea al status")
                                                         } else {
-                                                            res.status(204).send("Modificado")
+                                                            var change = new Change({
+                                                                message: req.params.username + "ha cambiado el estado de la tarea de " + docStatus.name + " a " + newState.name + ".",
+                                                                created_at: new Date()
+                                                            });
+                                                            db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                                                TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                                                    if (err)
+                                                                        res.status(500).send("Error al crear la tarea");
+                                                                    else {
+                                                                        res.status(204).send("Usuario eliminado usuario")
+                                                                    }
+                                                                });
+                                                            })
                                                         }
                                                     })
                                                 }
@@ -297,12 +336,42 @@ exports.updateTask = function (req, res) {
                     })
 
                     if (pertenece) {
-
                         TaskModel.findOneAndUpdate({ _id: req.params.idTask }, datos_a_actualizar).exec(function (err, taskActualizada) {
                             if (err) {
                                 return res.status(500).send("Error al actualizar la tarea.");
                             } else {
-                                return res.status(204).send("actualizado")
+                                var cambios = "El usuario a realizado las siguientes modificaciones: \n\n"
+                                if (req.body.name != undefined && req.body.name != taskActualizada.name)
+                                    cambios += "Nombre anterior: " + taskActualizada.name + ".\nNuevo nombre: " + req.body.name + ". \n\n"
+                                if (req.body.description != undefined && req.body.description != taskActualizada.description)
+                                    cambios += "Descripción anterior: " + taskActualizada.description + ".\nNueva descripción: " + req.body.description + ". \n\n"
+                                if (req.body.color != undefined && req.body.color != taskActualizada.color)
+                                    cambios += "Color anterior: " + taskActualizada.color + ".\nNuevo color: " + req.body.color + ". \n\n"
+                                if (req.body.start_date != undefined && req.body.start_date != taskActualizada.start_date)
+                                    cambios += "Fecha de inicio anterior: " + taskActualizada.start_date + ".\nNueva fecha de inicio: " + req.body.start_date + ". \n\n"
+                                if (req.body.estimated_end != undefined && req.body.estimated_end != taskActualizada.estimated_end)
+                                    cambios += "Fecha de fin estimada anterior: " + taskActualizada.estimated_end + ".\nNueva fecha de fin estimada: " + req.body.estimated_end + ". \n\n"
+                                if (req.body.end_date != undefined && req.body.end_date != taskActualizada.end_date)
+                                    cambios += "Fecha de finalización anterior: " + taskActualizada.end_date + ".\nNueva fecha de finalización: " + req.body.end_date + ". \n\n"
+
+                                if (cambios != "El usuario a realizado las siguientes modificaciones: \n\n") {
+                                    var change = new Change({
+                                        message: cambios,
+                                        created_at: new Date()
+                                    });
+                                    db.collection('changes').insertOne(change, function (err, changeCreado) {
+                                        TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
+                                            if (err)
+                                                res.status(500).send("Error al crear la tarea");
+                                            else {
+                                                res.status(204).send("Actualizado")
+                                            }
+                                        });
+                                    })
+                                } else {
+                                    res.status(204).send("Actualizado")
+                                }
+
                             }
                         })
                     } else {
