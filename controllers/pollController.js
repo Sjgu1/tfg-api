@@ -1,0 +1,153 @@
+var mongoose = require('mongoose');
+var User = require('../models/user');
+var Project = require('../models/project');
+var service = require('../service');
+var validator = require('validator');
+var Permission = require('../models/permission')
+var Role = require('../models/role')
+var Sprint = require('../models/sprint')
+var ObjectId = require('mongoose').Types.ObjectId;
+var Status = require('../models/status');
+var Task = require('../models/task');
+var Poll = require('../models/poll');
+var Vote = require('../models/vote');
+var Change = require('../models/change');
+
+exports.newPoll = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
+    var SprintModel = db.model('sprints', Sprint.schema)
+    var StatusModel = db.model('status', Status.schema)
+    var TaskModel = db.model('tasks', Task.schema)
+
+    var obj = req.body;
+    var poll = new Poll({
+        end_date: req.body.end_date,
+        votes: [],
+        changes: [],
+        created_at: new Date(),
+        updated_at: new Date()
+    });
+
+    //Se comprueba los campos obligatorios
+    if (req.body.end_date == undefined) {
+        res.status(400).send("El campo end_date es obligatorio");
+        //Se comprueba que el repositorio es una url
+    } else {
+        TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, taskEncontrada) {
+            if (err) {
+                res.status(500).send("Error al encontrar la tarea")
+            } else if (taskEncontrada == null) {
+                res.status(404).send("No existe la tarea")
+            } else if (taskEncontrada.poll != null || taskEncontrada.poll != undefined) {
+                res.status(404).send("Ya existe una votación")
+            } else {
+                db.collection('polls').insertOne(poll, function (err, pollCreada) {
+                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $set: { poll: pollCreada.ops[0]._id } }).exec(function (err, taskActualizada) {
+                        if (err)
+                            res.status(500).send("Error al crear la votación");
+                        else {
+                            res.status(201).send(taskActualizada)
+                        }
+                    });
+                })
+            }
+        })
+
+    }
+};
+
+exports.getPoll = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
+    var SprintModel = db.model('sprints', Sprint.schema)
+    var StatusModel = db.model('status', Status.schema)
+    var TaskModel = db.model('tasks', Task.schema)
+    var PollModel = db.model('polls', Poll.schema)
+
+
+    TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
+        if (err) {
+            res.status(500).send("Error al encontrar la tarea")
+        } else if (doc == null) {
+            res.status(404).send("No existe la tarea")
+        } else {
+            var query = { _id: new ObjectId(req.params.idTask) };
+            TaskModel.findOne(query).populate(['poll']).exec(function (err, pollEncontrada) {
+                if (err) {
+                    res.status(500).send("Error al conseguir la votación.");
+                }else if(pollEncontrada == null){
+                    res.status(404).send("No se ha encontrado la votación");
+                }
+                else
+                    res.status(200).send(pollEncontrada);
+            });
+        }
+    })
+
+}
+
+exports.updatePoll = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
+    var SprintModel = db.model('sprints', Sprint.schema)
+    var StatusModel = db.model('status', Status.schema)
+    var TaskModel = db.model('tasks', Task.schema)
+    var UserModel = db.model('users', User.schema)
+    var PollModel = db.model('polls', Poll.schema)
+
+
+    if (req.body.end_date == undefined) {
+        res.status(400).send("El campo end_date es obligatorio");
+    }else{
+        TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
+            if (err) {
+                res.status(500).send("Error al encontrar la tarea")
+            } else if (doc == null) {
+                res.status(404).send("No existe la tarea")
+            } else {
+                var query = { _id: new ObjectId(req.params.idPoll) };
+                PollModel.findOneAndUpdate(query, {  $set: { updated_at: new Date() , end_date: req.body.end_date} }, function (err, pollActualizada) {
+                    if (err) {
+                        res.status(500).send("Error al conseguir la votación.");
+                    }else if(pollActualizada == null){
+                        res.status(404).send("No se ha encontrado la votación");
+                    }
+                    else
+                        res.status(204).send(pollActualizada);
+                });
+            }
+        })
+    }
+}
+
+exports.deletePoll = function (req, res) {
+    var ProjectModel = db.model('projects', Project.schema)
+    var SprintModel = db.model('sprints', Sprint.schema)
+    var TaskModel = db.model('tasks', Task.schema)
+    var StatusModel = db.model('status', Status.schema)
+
+    StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, doc) {
+        if (!doc) {
+            res.status(404).send("No existe el status.");
+        } else {
+
+            var tasksStatus = []
+            var otra = [];
+            var pertenece = false;
+            doc.tasks.forEach(task => {
+                if (task == req.params.idTask && !pertenece)
+                    pertenece = true;
+            })
+        }
+        if (pertenece) {
+            var query = { _id: new ObjectId(req.params.idTask) };
+            TaskModel.remove(query).exec(function (err, tasks) {
+                if (err)
+                    return res.status(500).send("Error al conseguir el sprint.");
+                else {
+                    return res.status(201).send("borrado")
+                }
+            });
+        } else {
+            return res.status(404).send("La tarea o no existe o no tiene acceso el usuario conectado")
+        }
+    });
+}

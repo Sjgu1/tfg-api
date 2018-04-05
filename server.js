@@ -4,19 +4,20 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var auth = require('./controllers/auth');
+
 var middleware = require('./middleware/middleware');
+
+
 var projectController = require('./controllers/projectController');
 var userController = require('./controllers/userController');
 var permissionController = require('./controllers/permissionController');
 var roleController = require('./controllers/roleController');
 var sprintController = require('./controllers/sprintController');
 var statusController = require('./controllers/statusController');
-var User = require('./models/user');
-var Project = require ('./models/project');
-var Role = require('./models/role');
-var Permission = require('./models/permission');
 var taskController = require('./controllers/taskController');
 var changeController = require('./controllers/changeController');
+var pollController = require('./controllers/pollController')
+var voteController = require('./controllers/voteController')
 
 // Configuramos Express
 var app = express();
@@ -32,13 +33,6 @@ require('./models/user');
 var router = express.Router();
 app.use(router);
 
-
-router.get('/api/users', middleware.ensureAuthenticated, function (pet, resp) {
-  resp.status(200)
-  var array = []
-
-  resp.send(array)
-})
 // Rutas de autenticación y login
 router.post('/auth/signup', auth.emailSignup);
 router.post('/auth/login', auth.emailLogin);
@@ -126,8 +120,15 @@ router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus
 //router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/change', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTask);
 
 
-/***************** **************/
-/***************** **************/
+/***************** Poll **************/
+//Crear poll
+router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.newPoll);
+//Obtener poll 
+router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll', middleware.ensureAuthenticated, middleware.participaProject,pollController.getPoll);
+router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.updatePoll);
+router.delete('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.deletePoll);
+
+/***************** Vote **************/
 /***************** **************/
 /***************** **************/
 

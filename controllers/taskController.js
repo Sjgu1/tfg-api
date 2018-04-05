@@ -24,6 +24,7 @@ exports.newTask = function (req, res) {
         color: req.body.color,
         users: [],
         changes: [],
+        poll: null,
         created_at: new Date(),
         updated_at: new Date()
     });
@@ -67,7 +68,9 @@ exports.getTask = function (req, res) {
     var TaskModel = db.model('tasks', Task.schema)
 
     StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, doc) {
-        if (!doc) {
+        if (err) {
+            res.status(500).send("Error al obtener el estado");
+        } else if (doc == null) {
             res.status(404).send("No existe el estado.");
         } else {
 
@@ -279,7 +282,7 @@ exports.deleteTask = function (req, res) {
                 if (err)
                     return res.status(500).send("Error al conseguir el sprint.");
                 else {
-                   return res.status(201).send("borrado")
+                    return res.status(201).send("borrado")
                 }
             });
         } else {
