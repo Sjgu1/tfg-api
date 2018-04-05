@@ -181,8 +181,11 @@ exports.deleteVote = function (req, res) {
         } else {
             var query = { _id: new ObjectId(req.params.idVote) };
             VoteModel.remove(query, function (err, voteActualizado) {
+                console.log(voteActualizado)
                 if (err) {
                     res.status(500).send("Error al conseguir el voto.");
+                } else if (voteActualizado.n == 0) {
+                    res.status(404).send("No se ha encontrado el voto.");
                 } else {
 
                     var change = new Change({
