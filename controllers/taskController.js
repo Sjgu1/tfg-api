@@ -212,6 +212,63 @@ exports.updateTask = function (req, res) {
             }
         });
 
+    } else if (req.body.operation == "cambiarEstado") {
+        StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, doc) {
+            if (!doc) {
+                res.status(404).send("No existe el status.");
+            } else {
+                var statusTasks = []
+                var otra = [];
+                var pertenece = false;
+                doc.tasks.forEach(task1 => {
+                    if (task1 == req.params.idTask && !pertenece)
+                        pertenece = true;
+                })
+                if (pertenece) {
+                    StatusModel.findOne({ _id: req.body.statusId }).exec(function (err, newState) {
+                        if (err) {
+                            res.status(500).send("Error al obtener el nuevo estado")
+                        } else if (newState == null) {
+                            res.status(404).send("El estado indicado no existe")
+                        } else {
+                            TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, taskEncontrada) {
+                                if (err) {
+                                    res.status(500).send("Error al obtener la tarea")
+                                } else if (taskEncontrada == null) {
+                                    res.status(404).send("Tarea no encontrada")
+                                } else {
+
+                                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $set: { updated_at: new Date(), status: req.body.statusId } }).exec(function (err, task) {
+                                        if (err) {
+                                            res.status(500).send("Error al actualizar la tarea")
+                                        } else {
+                                            StatusModel.update({ _id: req.params.idStatus }, { $pull: { 'tasks': req.params.idTask  }}).exec( function (err, doc) {
+                                                if (err) {
+                                                    res.status(500).send("Error al eliminar tarea del status")
+                                                } else {
+                                                    StatusModel.findOneAndUpdate({ _id: req.body.statusId }, { $push: { 'tasks': { _id: new ObjectId(req.params.idTask) } } }, function (err, doc) {
+                                                        if (err) {
+                                                            res.status(500).send("Error al agregar tarea al status")
+                                                        } else {
+                                                            res.status(204).send("Modificado")
+                                                        }
+                                                    })
+                                                }
+                                            })
+
+                                        }
+                                    })
+
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    return res.status(404).send("La tarea o no existe o no tiene acceso el usuario conectado")
+                }
+            }
+        });
+
     } else {
         var datos_a_actualizar = {
             $set: {
