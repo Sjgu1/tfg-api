@@ -267,9 +267,6 @@ exports.deleteTask = function (req, res) {
         if (!doc) {
             res.status(404).send("No existe el status.");
         } else {
-
-            var tasksStatus = []
-            var otra = [];
             var pertenece = false;
             doc.tasks.forEach(task => {
                 if (task == req.params.idTask && !pertenece)

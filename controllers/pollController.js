@@ -14,9 +14,6 @@ var Vote = require('../models/vote');
 var Change = require('../models/change');
 
 exports.newPoll = function (req, res) {
-    var ProjectModel = db.model('projects', Project.schema)
-    var SprintModel = db.model('sprints', Sprint.schema)
-    var StatusModel = db.model('status', Status.schema)
     var TaskModel = db.model('tasks', Task.schema)
 
     var obj = req.body;
@@ -57,11 +54,8 @@ exports.newPoll = function (req, res) {
 };
 
 exports.getPoll = function (req, res) {
-    var ProjectModel = db.model('projects', Project.schema)
-    var SprintModel = db.model('sprints', Sprint.schema)
-    var StatusModel = db.model('status', Status.schema)
     var TaskModel = db.model('tasks', Task.schema)
-    var PollModel = db.model('polls', Poll.schema)
+
 
 
     TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
@@ -86,11 +80,7 @@ exports.getPoll = function (req, res) {
 }
 
 exports.updatePoll = function (req, res) {
-    var ProjectModel = db.model('projects', Project.schema)
-    var SprintModel = db.model('sprints', Sprint.schema)
-    var StatusModel = db.model('status', Status.schema)
     var TaskModel = db.model('tasks', Task.schema)
-    var UserModel = db.model('users', User.schema)
     var PollModel = db.model('polls', Poll.schema)
 
 
@@ -119,35 +109,29 @@ exports.updatePoll = function (req, res) {
 }
 
 exports.deletePoll = function (req, res) {
-    var ProjectModel = db.model('projects', Project.schema)
-    var SprintModel = db.model('sprints', Sprint.schema)
     var TaskModel = db.model('tasks', Task.schema)
-    var StatusModel = db.model('status', Status.schema)
+    var PollModel = db.model('polls', Poll.schema)
 
-    StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, doc) {
-        if (!doc) {
-            res.status(404).send("No existe el status.");
+    TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
+        if (err) {
+            res.status(500).send("Error al encontrar la tarea")
+        } else if (doc == null) {
+            res.status(404).send("No existe la tarea")
         } else {
-
-            var tasksStatus = []
-            var otra = [];
-            var pertenece = false;
-            doc.tasks.forEach(task => {
-                if (task == req.params.idTask && !pertenece)
-                    pertenece = true;
-            })
-        }
-        if (pertenece) {
-            var query = { _id: new ObjectId(req.params.idTask) };
-            TaskModel.remove(query).exec(function (err, tasks) {
-                if (err)
-                    return res.status(500).send("Error al conseguir el sprint.");
-                else {
-                    return res.status(201).send("borrado")
+            var query = { _id: new ObjectId(req.params.idPoll) };
+            PollModel.remove(query , function (err, pollActualizada) {
+                if (err) {
+                    res.status(500).send("Error al conseguir la votación.");
+                }else{
+                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $set: { poll: null, updated_at: new Date() } }).exec(function (err, taskActualizada) {
+                        if (err)
+                            res.status(500).send("Error al actualizar la tarea");
+                        else {
+                            res.status(201).send("Borrado");
+                        }
+                    });
                 }
             });
-        } else {
-            return res.status(404).send("La tarea o no existe o no tiene acceso el usuario conectado")
         }
-    });
+    })
 }
