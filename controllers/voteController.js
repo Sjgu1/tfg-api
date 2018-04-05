@@ -26,7 +26,7 @@ exports.newVote = function (req, res) {
     });
 
     //Se comprueba los campos obligatorios
-    if (req.body.value== undefined|| validator.isInt(req.body.value) == false) {
+    if (req.body.value == undefined || validator.isInt(req.body.value) == false) {
         res.status(400).send("El campo value es obligatorio y ha de ser un entero");
         //Se comprueba que el repositorio es una url
     } else {
@@ -35,19 +35,19 @@ exports.newVote = function (req, res) {
                 res.status(500).send("Error al encontrar la votación")
             } else if (pollEncontrada == null) {
                 res.status(404).send("No existe la votación")
-            }  else {
-                UserModel.findOne({username: req.params.username}).exec(function(err, userEncontrado){
+            } else {
+                UserModel.findOne({ username: req.params.username }).exec(function (err, userEncontrado) {
                     if (err) {
                         res.status(500).send("Error al encontrar el usuario")
                     } else if (userEncontrado == null) {
                         res.status(404).send("No existe el usuario")
-                    }  else {
+                    } else {
                         var participa = false;
                         pollEncontrada.votes.forEach(voto => {
-                            if(JSON.stringify(voto.user) === JSON.stringify(userEncontrado._id) && !participa)
-                                participa = true                     
+                            if (JSON.stringify(voto.user) === JSON.stringify(userEncontrado._id) && !participa)
+                                participa = true
                         });
-                        if(!participa){
+                        if (!participa) {
                             vote.user = userEncontrado._id
                             db.collection('votes').insertOne(vote, function (err, voteCreado) {
                                 PollModel.findOneAndUpdate({ _id: req.params.idPoll }, { $push: { votes: voteCreado.ops[0]._id } }).exec(function (err, pollActualizada) {
@@ -58,11 +58,11 @@ exports.newVote = function (req, res) {
                                     }
                                 });
                             })
-                        }else{
+                        } else {
                             res.status(400).send("El usuario ya ha votado")
                         }
                     }
-                      
+
                 })
             }
         })
@@ -70,49 +70,42 @@ exports.newVote = function (req, res) {
     }
 };
 exports.getVotes = function (req, res) {
-    var TaskModel = db.model('tasks', Task.schema)
-
-    TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
+    var PollModel = db.model('polls', Poll.schema)
+    PollModel.find({ _id: req.params.idPoll }).populate('votes').exec(function (err, votes) {
         if (err) {
-            res.status(500).send("Error al encontrar la tarea")
-        } else if (doc == null) {
-            res.status(404).send("No existe la tarea")
-        } else {
-            var query = { _id: new ObjectId(req.params.idTask) };
-            TaskModel.findOne(query).populate(['poll']).exec(function (err, pollEncontrada) {
-                if (err) {
-                    res.status(500).send("Error al conseguir la votación.");
-                }else if(pollEncontrada == null){
-                    res.status(404).send("No se ha encontrado la votación");
-                }
-                else
-                    res.status(200).send(pollEncontrada);
-            });
+            res.status(500).send("No se han localizado la votación");
+
+        } else if (votes == null) {
+            res.status(404).send("No se encuentra la votación");
         }
-    })
+        else {
+            res.status(200).send(votes);
+
+        }
+    });
 
 }
 
 exports.getVote = function (req, res) {
-    var TaskModel = db.model('tasks', Task.schema)
+    var PollModel = db.model('polls', Poll.schema)
+    var VoteModel = db.model('votes', Vote.schema)
 
 
-
-    TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
+    PollModel.findOne({ _id: req.params.idPoll }).exec(function (err, doc) {
         if (err) {
-            res.status(500).send("Error al encontrar la tarea")
+            res.status(500).send("Error al encontrar la votación")
         } else if (doc == null) {
-            res.status(404).send("No existe la tarea")
+            res.status(404).send("No existe la votación")
         } else {
-            var query = { _id: new ObjectId(req.params.idTask) };
-            TaskModel.findOne(query).populate(['poll']).exec(function (err, pollEncontrada) {
+            var query = { _id: new ObjectId(req.params.idVote) };
+            VoteModel.findOne(query).populate(['user']).exec(function (err, voteEncontrado) {
                 if (err) {
-                    res.status(500).send("Error al conseguir la votación.");
-                }else if(pollEncontrada == null){
-                    res.status(404).send("No se ha encontrado la votación");
+                    res.status(500).send("Error al conseguir el voto.");
+                } else if (voteEncontrado == null) {
+                    res.status(404).send("No se ha encontrado el voto");
                 }
                 else
-                    res.status(200).send(pollEncontrada);
+                    res.status(200).send(voteEncontrado);
             });
         }
     })
@@ -122,53 +115,51 @@ exports.getVote = function (req, res) {
 exports.updateVote = function (req, res) {
     var TaskModel = db.model('tasks', Task.schema)
     var PollModel = db.model('polls', Poll.schema)
+    var VoteModel = db.model('votes', Vote.schema)
 
-    TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
-        if (err) {
-            res.status(500).send("Error al encontrar la tarea")
-        } else if (doc == null) {
-            res.status(404).send("No existe la tarea")
-        } else {
-            var query = { _id: new ObjectId(req.params.idPoll) };
-            PollModel.remove(query , function (err, pollActualizada) {
-                if (err) {
-                    res.status(500).send("Error al conseguir la votación.");
-                }else{
-                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $set: { poll: null, updated_at: new Date() } }).exec(function (err, taskActualizada) {
-                        if (err)
-                            res.status(500).send("Error al actualizar la tarea");
-                        else {
-                            res.status(201).send("Borrado");
-                        }
-                    });
-                }
-            });
-        }
-    })
+    if (req.body.value == undefined) {
+        res.status(400).send("El campo end_date es obligatorio");
+    } else {
+        PollModel.findOne({ _id: req.params.idPoll }).exec(function (err, doc) {
+            if (err) {
+                res.status(500).send("Error al encontrar la votación")
+            } else if (doc == null) {
+                res.status(404).send("No existe la votación")
+            } else {
+                var query = { _id: new ObjectId(req.params.idVote) };
+                VoteModel.findOneAndUpdate(query, { $set: { updated_at: new Date(), value: req.body.value } }, function (err, voteActualizado) {
+                    if (err) {
+                        res.status(500).send("Error al conseguir el voto.");
+                    } else if (voteActualizado == null) {
+                        res.status(404).send("No se ha encontrado el voto");
+                    }
+                    else
+                        res.status(204).send(voteActualizado);
+                });
+            }
+        })
+    }
 }
 
 exports.deleteVote = function (req, res) {
     var TaskModel = db.model('tasks', Task.schema)
     var PollModel = db.model('polls', Poll.schema)
+    var VoteModel = db.model('votes', Vote.schema)
 
-    TaskModel.findOne({ _id: req.params.idTask }).exec(function (err, doc) {
+
+    PollModel.findOne({ _id: req.params.idPoll }).exec(function (err, doc) {
         if (err) {
-            res.status(500).send("Error al encontrar la tarea")
+            res.status(500).send("Error al encontrar la votación")
         } else if (doc == null) {
-            res.status(404).send("No existe la tarea")
+            res.status(404).send("No existe la votación")
         } else {
-            var query = { _id: new ObjectId(req.params.idPoll) };
-            PollModel.remove(query , function (err, pollActualizada) {
+            var query = { _id: new ObjectId(req.params.idVote) };
+            VoteModel.remove(query, function (err, voteActualizado) {
                 if (err) {
-                    res.status(500).send("Error al conseguir la votación.");
-                }else{
-                    TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $set: { poll: null, updated_at: new Date() } }).exec(function (err, taskActualizada) {
-                        if (err)
-                            res.status(500).send("Error al actualizar la tarea");
-                        else {
-                            res.status(201).send("Borrado");
-                        }
-                    });
+                    res.status(500).send("Error al conseguir el voto.");
+                } else {
+
+                    res.status(201).send("Borrado");
                 }
             });
         }
