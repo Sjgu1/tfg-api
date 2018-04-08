@@ -39,114 +39,114 @@ router.post('/auth/login', auth.emailLogin);
 
 /**************************************************************** User ****************************************************************/ 
 //Mostrar usuario
-router.get('/user/:username', middleware.ensureAuthenticated, userController.getUser);
+router.get('/users/:username', middleware.ensureAuthenticated, userController.getUser);
 //Actualizar datos de usuario
-router.put('/user/:username', middleware.ensureAuthenticated, userController.updateUser);
+router.put('/users/:username', middleware.ensureAuthenticated, userController.updateUser);
 //Borrar usuario
-router.delete('/user/:username', middleware.ensureAuthenticated, userController.deleteUser);
+router.delete('/users/:username', middleware.ensureAuthenticated, userController.deleteUser);
 /**************************************************************************************************************************************/
 
 /**************************************************************** Project ****************************************************************/ 
 //Crear proyecto
-router.post('/user/:username/project', middleware.ensureAuthenticated, projectController.newProject);
+router.post('/users/:username/projects', middleware.ensureAuthenticated, projectController.newProject);
 //Listar proyectos de usuario. 
-router.get('/user/:username/project', middleware.ensureAuthenticated,  projectController.getProjects);
-router.get('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoAdmin, projectController.getProject);
+router.get('/users/:username/projects', middleware.ensureAuthenticated,  projectController.getProjects);
+router.get('/users/:username/projects/:idProject', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoAdmin, projectController.getProject);
 //Actualizar información de un proyecto en concreto. 
-router.put('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.updateProject);
+router.put('/users/:username/projects/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.updateProject);
 //Borrar Proyecto
-router.delete('/user/:username/project/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.deleteProject);
+router.delete('/users/:username/projects/:idProject', middleware.ensureAuthenticated, middleware.participaProject,  middleware.comprobarPermisoAdmin, projectController.deleteProject);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Permission ****************************************************************/ 
 //Create
-router.post('/permission', middleware.ensureAuthenticated, permissionController.newPermission);
+router.post('/permissions', middleware.ensureAuthenticated, permissionController.newPermission);
 //Read
-router.get('/permission/:name', middleware.ensureAuthenticated, permissionController.getPermission);
-router.get('/permission', middleware.ensureAuthenticated, permissionController.getPermissions);
+router.get('/permissions/:name', middleware.ensureAuthenticated, permissionController.getPermission);
+router.get('/permissions', middleware.ensureAuthenticated, permissionController.getPermissions);
 //Delete
-router.delete('/permission/:name', middleware.ensureAuthenticated, permissionController.deletePermission);
+router.delete('/permissions/:name', middleware.ensureAuthenticated, permissionController.deletePermission);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Role ****************************************************************/  
 //Create
-router.post('/role', middleware.ensureAuthenticated, roleController.newRole);
+router.post('/roles', middleware.ensureAuthenticated, roleController.newRole);
 //Read
-router.get('/role/:name', middleware.ensureAuthenticated, roleController.getRole);
-router.get('/role', middleware.ensureAuthenticated, roleController.getRoles);
+router.get('/roles/:name', middleware.ensureAuthenticated, roleController.getRole);
+router.get('/roles', middleware.ensureAuthenticated, roleController.getRoles);
 //Delete
-router.delete('/role/:name', middleware.ensureAuthenticated, roleController.deleteRole);
+router.delete('/roles/:name', middleware.ensureAuthenticated, roleController.deleteRole);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Sprint ****************************************************************/ 
 //Crear sprint
-router.post('/user/:username/project/:idProject/sprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.newSprint);
+router.post('/users/:username/projects/:idProject/sprints', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.newSprint);
 //Listar sprints de proyecto. 
-router.get('/user/:username/project/:idProject/sprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprints);
-router.get('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprint);
+router.get('/users/:username/projects/:idProject/sprints', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprints);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprint);
 //Actualizar información de un proyecto en concreto. 
-router.put('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.updateSprint);
+router.put('/users/:username/projects/:idProject/sprints/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.updateSprint);
 //Borrar Proyecto
-router.delete('/user/:username/project/:idProject/sprint/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.deleteSprint);
+router.delete('/users/:username/projects/:idProject/sprints/:idSprint', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.deleteSprint);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Status ****************************************************************/ 
 //Crear status
-router.post('/user/:username/project/:idProject/sprint/:idSprint/status', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.newStatus);
+router.post('/users/:username/projects/:idProject/sprints/:idSprint/status', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.newStatus);
 //Listar status de sprints. 
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getAllStatus);
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getStatus);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getAllStatus);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getStatus);
 //Actualizar información de un status en concreto. 
-router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.updateStatus);
+router.put('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.updateStatus);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Task ****************************************************************/ 
 //Crear task
-router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.newTask);
+router.post('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.newTask);
 //Listar sprints de proyecto. 
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTasks);
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTask);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTasks);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask', middleware.ensureAuthenticated, middleware.participaProject,taskController.getTask);
 //Actualizar información de un proyecto en concreto. 
-router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject,taskController.updateTask);
+router.put('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask', middleware.ensureAuthenticated, middleware.participaProject,taskController.updateTask);
 //Borrar Proyecto
-router.delete('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.deleteTask);
+router.delete('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask', middleware.ensureAuthenticated, middleware.participaProject, middleware.comprobarPermisoJefe,taskController.deleteTask);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Change ****************************************************************/ 
 //Crear change
-router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/change', middleware.ensureAuthenticated, middleware.participaProject,changeController.newChange);
+router.post('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/changes', middleware.ensureAuthenticated, middleware.participaProject,changeController.newChange);
 //Listar changes de task. 
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/change', middleware.ensureAuthenticated, middleware.participaProject,changeController.getChanges);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/changes', middleware.ensureAuthenticated, middleware.participaProject,changeController.getChanges);
 /**************************************************************************************************************************************/
 
 
 
 /**************************************************************** Poll ****************************************************************/ 
 //Crear poll
-router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.newPoll);
+router.post('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.newPoll);
 //Obtener poll 
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,pollController.getPoll);
-router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.updatePoll);
-router.delete('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.deletePoll);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,pollController.getPoll);
+router.put('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.updatePoll);
+router.delete('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll', middleware.ensureAuthenticated, middleware.participaProject,middleware.comprobarPermisoJefe,pollController.deletePoll);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Vote ****************************************************************/ 
 //Crear vote
-router.post('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll/vote', middleware.ensureAuthenticated, middleware.participaProject,voteController.newVote);
+router.post('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll/votes', middleware.ensureAuthenticated, middleware.participaProject,voteController.newVote);
 //Obtener vote 
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll/vote', middleware.ensureAuthenticated, middleware.participaProject,voteController.getVotes);
-router.get('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll/vote/:idVote', middleware.ensureAuthenticated, middleware.participaProject,voteController.getVote);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll/votes', middleware.ensureAuthenticated, middleware.participaProject,voteController.getVotes);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll/votes/:idVote', middleware.ensureAuthenticated, middleware.participaProject,voteController.getVote);
 //Update vote
-router.put('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll/vote/:idVote', middleware.ensureAuthenticated, middleware.participaProject,voteController.updateVote);
+router.put('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll/votes/:idVote', middleware.ensureAuthenticated, middleware.participaProject,voteController.updateVote);
 //Delete vote
-router.delete('/user/:username/project/:idProject/sprint/:idSprint/status/:idStatus/task/:idTask/poll/:idPoll/vote/:idVote', middleware.ensureAuthenticated, middleware.participaProject,voteController.deleteVote);
+router.delete('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus/tasks/:idTask/polls/:idPoll/votes/:idVote', middleware.ensureAuthenticated, middleware.participaProject,voteController.deleteVote);
 /**************************************************************************************************************************************/
 
 
