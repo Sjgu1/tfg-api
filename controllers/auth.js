@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var User = require('../models/user');
 var service = require('../service');
 var validator = require('validator');
+var bcrypt = require('bcrypt-nodejs')
 
 exports.emailSignup = function (req, res) {
     var obj = req.body;
@@ -35,12 +36,22 @@ exports.emailSignup = function (req, res) {
                         return res.status(409).send("El email ya existe en la base de datos");
                         //Se comprueba que el email no se repite
                     } else {
-                        db.collection('users').insertOne(user, function (err, userCreado) {
-                            if (err)
-                                return res.status(500).send("Error al crear un usuario"); //Error al crear el usuario en la base de datos
-                                                          
-                            return res.status(201).send({ user: user }); //Todo ha ido bien, se agrega el usuario
-                        });
+
+                        bcrypt.hash(user.password, null, null, function (errHash, hash) {
+                            if (errHash) {
+                                return res.status(500).send("Error al generar hash"); //Error al crear el usuario en la base de datos
+
+                            } else {
+                                user.password = hash
+                                db.collection('users').insertOne(user, function (err, userCreado) {
+                                    if (err)
+                                        return res.status(500).send("Error al crear un usuario"); //Error al crear el usuario en la base de datos
+                                    else
+                                        return res.status(201).send({ user: user }); //Todo ha ido bien, se agrega el usuario
+                                });
+                            }
+
+                        })
                     }
                 });
             }
@@ -62,15 +73,21 @@ exports.emailLogin = function (req, res) {
             return res.status(401).send("No existe el usuario en la base de datos");
         }
 
-        if (obj.password == user.password) {
-            var token = service.createToken(user);
-            db.collection('users').findOneAndUpdate( { username: req.body.username },  {$set :{ token: token , updated_at: new Date()}} , function (err, user) {
-                if (err)
-                    return res.status(500).send("Error al guardar el token");
-                return res.status(200).send({ token: token });
-            });
-        } else {
-            res.status(401).send("Contraseña erronea");
-        }
+        bcrypt.compare(obj.password, user.password, function (errHash, coinciden) {
+            if (!coinciden) {
+                return res.status(500).send("Contraseña erronea"); //Error al crear el usuario en la base de datos
+
+            } else {
+
+                var token = service.createToken(user);
+                db.collection('users').findOneAndUpdate({ username: req.body.username }, { $set: { token: token, updated_at: new Date() } }, function (err, user) {
+                    if (err)
+                        return res.status(500).send("Error al guardar el token");
+                    return res.status(200).send({ token: token });
+                });
+
+            }
+        });
+
     });
 };
