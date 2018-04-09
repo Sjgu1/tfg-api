@@ -44,6 +44,9 @@ router.get('/users/:username', middleware.ensureAuthenticated, userController.ge
 router.put('/users/:username', middleware.ensureAuthenticated, userController.updateUser);
 //Borrar usuario
 router.delete('/users/:username', middleware.ensureAuthenticated, userController.deleteUser);
+
+//Busqueda de usuarios
+router.get('/users/search/:username', userController.searchUser);
 /**************************************************************************************************************************************/
 
 /**************************************************************** Project ****************************************************************/ 
