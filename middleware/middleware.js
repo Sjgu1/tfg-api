@@ -37,7 +37,9 @@ exports.comprobarToken = function (req, res, next) {
       //se comprueba que el token del usuario que hace la peticion es el mismo que los datos del usuario que se piden
     } else if (doc.token != req.headers.authorization) {
       res.status(401).send("El token no corresponde al usuario logeado.");
+    }else{
       next();
+
     }
   })
 }

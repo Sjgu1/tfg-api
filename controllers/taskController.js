@@ -41,7 +41,7 @@ exports.newTask = function (req, res) {
                 if (err)
                     res.status(500).send("Error al crear la tarea");
                 else {
-                    res.status(201).send(statusActualizado)
+                    res.status(201).send(taskCreada.ops[0])
                 }
             });
         })
@@ -51,10 +51,10 @@ exports.getTasks = function (req, res) {
     var StatusModel = db.model('status', Status.schema)
     StatusModel.find({ _id: req.params.idStatus }).populate('tasks').exec(function (err, tasks) {
         if (err) {
-            res.status(500).send("No se han localizado los proyectos");
+            res.status(500).send("Error al obtener las tareas");
 
         } else if (tasks == null) {
-            res.status(404).send("No se encuentran los sprints asociados");
+            res.status(404).send("No se encuentran tareas asociadas");
         }
         else {
             res.status(200).send(tasks);
@@ -242,7 +242,7 @@ exports.updateTask = function (req, res) {
     } else if (req.body.operation == "cambiarEstado") {
         StatusModel.findOne({ _id: req.params.idStatus }).exec(function (err, docStatus) {
             if (!docStatus) {
-                res.status(404).send("No existe el status.");
+                res.status(404).send("No existe el estado.");
             } else {
                 var statusTasks = []
                 var otra = [];

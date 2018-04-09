@@ -32,7 +32,7 @@ exports.newStatus = function (req, res) {
                 if (err)
                     res.status(500).send("Error al crear el estado");
                 else {
-                    res.status(201).send(sprintActualizado)
+                    res.status(201).send(estadoCreado.ops[0])
                 }
             });
         })
@@ -42,10 +42,10 @@ exports.getAllStatus = function (req, res) {
     var SprintModel = db.model('sprints', Sprint.schema)
     SprintModel.find({ _id: req.params.idSprint }).populate(['status']).exec(function (err, sprints) {
         if (err) {
-            res.status(500).send("No se han localizado los proyectos");
+            res.status(500).send("Error al buscar los estados");
 
         } else if (sprints == null) {
-            res.status(404).send("No se encuentran los sprints asociados");
+            res.status(404).send("No se encuentran los estados asociados");
         }
         else
             res.status(200).send(sprints);

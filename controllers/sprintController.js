@@ -19,8 +19,8 @@ exports.newSprint = function (req, res) {
     var sprint = new Sprint({
         name: req.body.name,
         description: req.body.description,
-        start_date: req.body.start_date,
-        estimated_end: req.body.estimated_end,
+        start_date: new Date(req.body.start_date),
+        estimated_end: new Date(req.body.estimated_end),
         project: ObjectId(req.params.idProject),
         status: [],
         created_at: new Date(),
@@ -29,17 +29,26 @@ exports.newSprint = function (req, res) {
 
     //Se comprueba los campos obligatorios
     if (req.body.name == undefined) {
-        res.status(400).send("el campo name es obligatorio");
+        res.status(400).send("El campo name es obligatorio");
         //Se comprueba que el repositorio es una url
     } else {
+
         db.collection('sprints').insertOne(sprint, function (err, sprintCreado) {
-            ProjectModel.findOneAndUpdate({ _id: sprint.project }, { $push: { sprints: sprintCreado.ops[0]._id } }).exec(function (err, projActualizado) {
-                if (err)
-                    res.status(500).send("Error al crear el sprint");
-                else {
-                    res.status(201).send(projActualizado)
-                }
-            });
+            if(err){
+                res.status(500).send("Error al crear el sprint");
+
+            }else if(sprintCreado == null){
+                res.status(500).send("Error al crear el sprint");
+
+            }else{
+                ProjectModel.findOneAndUpdate({ _id: sprint.project }, { $push: { sprints: sprintCreado.ops[0]._id } }).exec(function (err, projActualizado) {
+                    if (err)
+                        res.status(500).send("Error al crear el sprint");
+                    else {
+                       return res.status(201).send(sprintCreado.ops[0])
+                    }
+                });
+            }       
         })
     }
 };
@@ -47,7 +56,7 @@ exports.getSprints = function (req, res) {
     var SprintModel = db.model('sprints', Sprint.schema)
     SprintModel.find({ project: req.params.idProject }).populate(['project.name', 'status']).exec(function (err, sprints) {
         if (err) {
-            res.status(500).send("No se han localizado los proyectos");
+            res.status(500).send("No se ha localizado el proyecto");
 
         } else if (sprints == null) {
             res.status(404).send("No se encuentran los sprints asociados");

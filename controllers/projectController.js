@@ -27,7 +27,7 @@ exports.newProject = function (req, res) {
     //Se comprueba los campos obligatorios
 
     if (req.body.repository == undefined || req.body.name == undefined) {
-        res.status(400).send("Los campos name son obligatorios");
+        res.status(400).send("Los campos name y repository son obligatorios");
         //Se comprueba que el repositorio es una url
     } else if (!validator.isURL(req.body.repository)) {
         res.status(400).send("El repositorio tiene que ser una url valida")
@@ -161,17 +161,17 @@ exports.deleteProject = function (req, res) {
 
                     db.collection('projects').findOneAndDelete(query, function (err, proyectos) {
                         if (err)
-                            return res.status(500).send("Error al conseguir los proyectos.");
+                            return res.status(500).send("Error al conseguir el proyecto.");
                         else {
                             for (var i = 0; i < participantes.length; i++) {
                                 var id = participantes[i]
                                 db.collection('users').findOneAndUpdate({ _id: id }, { $pull: { 'projects': { _id: new ObjectId(req.params.idProject) } }, $set: { updated_at: new Date() } }, function (err, doc) {
                                     if (err)
-                                        return res.status(500).send("Error al conseguir los proyectos.");
+                                        return res.status(500).send("Error al conseguir el proyecto.");
                                 })
                                 db.collection('users').findOneAndUpdate({ username: req.params.username }, { $pull: { 'projects': { _id: new ObjectId(req.params.idProject) } }, $set: { updated_at: new Date() } }, function (err, doc) {
                                     if (err)
-                                        return res.status(500).send("Error al conseguir los proyectos.");
+                                        return res.status(500).send("Error al conseguir el proyecto.");
                                 })
                             }
                             return res.status(204).send("Se ha borrado el proyecto");
