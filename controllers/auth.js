@@ -39,15 +39,15 @@ exports.emailSignup = function (req, res) {
 
                         bcrypt.hash(user.password, null, null, function (errHash, hash) {
                             if (errHash) {
-                                return res.status(500).send("Error al generar hash"); //Error al crear el usuario en la base de datos
+                                return res.status(500).send("Error al crear el usuario por parte del servidor"); //Error al crear el usuario en la base de datos
 
                             } else {
                                 user.password = hash
                                 db.collection('users').insertOne(user, function (err, userCreado) {
                                     if (err)
-                                        return res.status(500).send("Error al crear un usuario"); //Error al crear el usuario en la base de datos
+                                        return res.status(500).send("Error al crear el usuario por parte del servidor"); //Error al crear el usuario en la base de datos
                                     else
-                                        return res.status(201).send({ user: user }); //Todo ha ido bien, se agrega el usuario
+                                        return res.status(201).send({ username: user }); //Todo ha ido bien, se agrega el usuario
                                 });
                             }
 
@@ -75,7 +75,7 @@ exports.emailLogin = function (req, res) {
 
         bcrypt.compare(obj.password, user.password, function (errHash, coinciden) {
             if (!coinciden) {
-                return res.status(500).send("Contraseña erronea"); //Error al crear el usuario en la base de datos
+                return res.status(500).send("Contraseña errónea"); //Error al crear el usuario en la base de datos
 
             } else {
 

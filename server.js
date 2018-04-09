@@ -19,6 +19,14 @@ var changeController = require('./controllers/changeController');
 var pollController = require('./controllers/pollController')
 var voteController = require('./controllers/voteController')
 
+
+var swaggerize = require('swaggerize-express');
+ 
+app.use(swaggerize({
+    api: require('./api.json'),
+    docspath: '/api-docs',
+    handlers: './handlers'
+}));
 // Configuramos Express
 var app = express();
 app.use(bodyParser.json());

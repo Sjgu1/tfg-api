@@ -13,7 +13,7 @@ exports.getUser = function (req, res) {
         } else {
             db.collection('users').findOne({ username: req.params.username }, { projects: 0, password: 0, admin: 0, token: 0 }, function (err2, user) {
                 if (err2)
-                    res.status(500).send(err2)
+                    res.status(500).send("Error de ")
                 res.status(200).send(user);
             })
         }
