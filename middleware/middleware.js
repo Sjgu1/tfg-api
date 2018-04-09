@@ -42,6 +42,16 @@ exports.comprobarToken = function (req, res, next) {
   })
 }
 
+exports.comprobarAdmin = function (req, res, next) {
+  if (req.params.username == "sergiojuliogu") {
+    next();
+  } else {
+    res.status(403).send("Acción solo para administrador del sistema")
+
+  }
+}
+
+
 exports.comprobarPermisoAdmin = function (req, res, next) {
   var UserModel = db.model('users', User.schema)
   var ProjectModel = db.model('projects', Project.schema)

@@ -64,23 +64,23 @@ router.delete('/users/:username/projects/:idProject', middleware.ensureAuthentic
 
 /**************************************************************** Permission ****************************************************************/ 
 //Create
-router.post('/permissions', middleware.ensureAuthenticated, permissionController.newPermission);
+router.post('/users/:username/permissions', middleware.ensureAuthenticated,middleware.comprobarAdmin, permissionController.newPermission);
 //Read
-router.get('/permissions/:name', middleware.ensureAuthenticated, permissionController.getPermission);
-router.get('/permissions', middleware.ensureAuthenticated, permissionController.getPermissions);
+router.get('/users/:username/permissions/:name', middleware.ensureAuthenticated, permissionController.getPermission);
+router.get('/users/:username/permissions', middleware.ensureAuthenticated, permissionController.getPermissions);
 //Delete
-router.delete('/permissions/:name', middleware.ensureAuthenticated, permissionController.deletePermission);
+router.delete('/users/:username/permissions/:name', middleware.ensureAuthenticated,middleware.comprobarAdmin, permissionController.deletePermission);
 /**************************************************************************************************************************************/
 
 
 /**************************************************************** Role ****************************************************************/  
 //Create
-router.post('/roles', middleware.ensureAuthenticated, roleController.newRole);
+router.post('/users/:username/roles', middleware.ensureAuthenticated,middleware.comprobarAdmin, roleController.newRole);
 //Read
-router.get('/roles/:name', middleware.ensureAuthenticated, roleController.getRole);
-router.get('/roles', middleware.ensureAuthenticated, roleController.getRoles);
+router.get('/users/:username/roles/:name', middleware.ensureAuthenticated, roleController.getRole);
+router.get('/users/:username/roles', middleware.ensureAuthenticated, roleController.getRoles);
 //Delete
-router.delete('/roles/:name', middleware.ensureAuthenticated, roleController.deleteRole);
+router.delete('/users/:username/roles/:name', middleware.ensureAuthenticated,middleware.comprobarAdmin, roleController.deleteRole);
 /**************************************************************************************************************************************/
 
 

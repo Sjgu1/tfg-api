@@ -23,6 +23,7 @@ exports.newVote = function (req, res) {
     var vote = new Vote({
         value: req.body.value,
         user: null,
+        comment: req.body.comment,
         created_at: new Date(),
         updated_at: new Date()
     });
@@ -57,7 +58,7 @@ exports.newVote = function (req, res) {
                                         res.status(500).send("Error al crear el voto");
                                     else {
                                         var change = new Change({
-                                            message: "El usuario " + req.params.username + " ha votado la tarea con una puntuación de " + req.body.value + " de dificultad.",
+                                            message: "El usuario " + req.params.username + " ha votado la tarea con una puntuación de " + req.body.value + " de dificultad con el mensaje "+req.body.comment+".",
                                             created_at: new Date()
                                         });
                                         db.collection('changes').insertOne(change, function (err, changeCreado) {
@@ -141,14 +142,14 @@ exports.updateVote = function (req, res) {
                 res.status(404).send("No existe la votación")
             } else {
                 var query = { _id: new ObjectId(req.params.idVote) };
-                VoteModel.findOneAndUpdate(query, { $set: { updated_at: new Date(), value: req.body.value } }, function (err, voteActualizado) {
+                VoteModel.findOneAndUpdate(query, { $set: { updated_at: new Date(), value: req.body.value, comment: req.body.comment } }, function (err, voteActualizado) {
                     if (err) {
                         res.status(500).send("Error al conseguir el voto.");
                     } else if (voteActualizado == null) {
                         res.status(404).send("No se ha encontrado el voto");
                     } else {
                         var change = new Change({
-                            message: "El usuario " + req.params.username + " ha cambiado su voto de " + voteActualizado.value + " a " + req.body.value + ".",
+                            message: "El usuario " + req.params.username + " ha cambiado su voto de " + voteActualizado.value + " a " + req.body.value + " con el mensaje "+req.body.comment+".",
                             created_at: new Date()
                         });
                         db.collection('changes').insertOne(change, function (err, changeCreado) {

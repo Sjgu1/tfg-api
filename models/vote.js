@@ -8,6 +8,7 @@ var Poll = require('./poll')
 var voteSchema = new Schema({
   value: { type: Number, required: true},
   user: {type:mongoose.Schema.Types.ObjectId, ref: 'User'},
+  comment: String,
   created_at: Date,
   updated_at: Date
 });
