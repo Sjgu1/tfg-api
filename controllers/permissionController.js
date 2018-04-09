@@ -43,7 +43,7 @@ exports.getPermission = function (req, res) {
         } else {
             db.collection('permissions').findOne({ name: req.params.name }, function (err2, permission) {
                 if (err2)
-                    res.status(500).send(err2)
+                    res.status(500).send("Error al conseguir el permiso")
                 res.status(200).send(permission);
             })
         }
@@ -67,7 +67,7 @@ exports.deletePermission = function (req, res) {
         } else {
             db.collection('permissions').remove({ name: req.params.name }, function (err2, permission) {
                 if (err2)
-                    res.status(500).send(err2)
+                    res.status(500).send("Error al conseguir el permiso")
                 res.status(204).send("Se ha borrado el permiso");
             })
         }

@@ -63,7 +63,7 @@ exports.getRole = function (req, res) {
         } else {
             RoleModel.findOne({ name: req.params.name }).populate('permissions').exec(function (err2, role) {
                 if (err2)
-                    res.status(500).send(err2)
+                    res.status(500).send("Erro al conseguir el rol")
                 res.status(200).send(role);
             })
         }
@@ -89,7 +89,7 @@ exports.deleteRole = function (req, res) {
         } else {
             RoleModel.remove({ name: req.params.name }, function (err2, role) {
                 if (err2)
-                    res.status(500).send(err2)
+                    res.status(500).send("Error al borrar el rol")
                 res.status(204).send("Se ha borrado el rol");
             })
         }

@@ -53,7 +53,7 @@ exports.newProject = function (req, res) {
                                         res.status(201);
                                         var loc = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + proyectoCreado.ops[0]._id
                                         res.setHeader('location', loc);
-                                        res.send(probando.value);
+                                        res.send(probando);
                                     });
                                 }
                             });

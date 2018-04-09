@@ -27,9 +27,6 @@ exports.searchUser = function (req, res) {
     var patron = "" + req.params.username + ""
 
     UserModel.find({ "username": { $regex: patron } }, { username: 1 }).exec(function (err, doc) {
-        console.log(patron)
-        console.log(doc)
-        console.log(err)
         if (err) {
             return res.status(500).send("Error servidor")
         } else if (!doc) {
@@ -48,7 +45,7 @@ exports.deleteUser = function (req, res) {
         } else {
             db.collection('users').remove({ username: req.params.username }, function (err2, user) {
                 if (err2)
-                    res.status(500).send(err2)
+                    res.status(500).send("Error al borrar")
                 res.status(204).send("Se ha borrado el usuario");
             })
         }
@@ -106,7 +103,7 @@ exports.updateUser = function (req, res) {
                                     }
                                     db.collection('users').findOneAndUpdate({ username: req.params.username }, datos_a_actualizar, function (err2, user) {
                                         if (err2)
-                                            res.status(500).send(err2)
+                                            res.status(500).send("Error al actualizar")
                                         //console.log(user);
                                         return res.status(204).send({ user: user });
                                     })
