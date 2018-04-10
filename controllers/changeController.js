@@ -31,9 +31,9 @@ exports.newChange = function (req, res) {
         db.collection('changes').insertOne(change, function (err, changeCreado) {
             TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
                 if (err)
-                    res.status(500).send("Error al crear la tarea");
+                    res.status(500).send("Error al crear el cambio");
                 else {
-                    res.status(201).send(taskActualizada)
+                    res.status(201).send(changeCreado.ops[0])
                 }
             });
         })
