@@ -66,7 +66,7 @@ exports.newVote = function (req, res) {
                                                 if (err)
                                                     res.status(500).send("Error al crear la tarea");
                                                 else {
-                                                    res.status(204).send(pollActualizada);
+                                                    res.status(204).send(voteCreado.ops[0]);
                                                 }
                                             });
                                         })
