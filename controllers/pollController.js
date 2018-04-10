@@ -52,7 +52,7 @@ exports.newPoll = function (req, res) {
                                     if (err)
                                         res.status(500).send("Error al crear la tarea");
                                     else {
-                                        res.status(201).send(pollCreada.ops[0]._id)
+                                        res.status(201).send(pollCreada.ops[0])
                                     }
                                 });
                             })

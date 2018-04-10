@@ -46,7 +46,7 @@ exports.getChanges = function (req, res) {
             res.status(500).send("No se han localizado los cambios");
 
         } else if (changes == null) {
-            res.status(404).send("No se encuentran el estado asociado");
+            res.status(404).send("No se encuentra la tarea asociada");
         }
         else {
             res.status(200).send(changes);
