@@ -49,7 +49,7 @@ exports.getChanges = function (req, res) {
             res.status(404).send("No se encuentran el estado asociado");
         }
         else {
-            res.status(200).send(changes.changes);
+            res.status(200).send(changes);
 
         }
     });
