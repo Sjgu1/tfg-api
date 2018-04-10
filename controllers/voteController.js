@@ -64,7 +64,7 @@ exports.newVote = function (req, res) {
                                         db.collection('changes').insertOne(change, function (err, changeCreado) {
                                             TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
                                                 if (err)
-                                                    res.status(500).send("Error al crear la tarea");
+                                                    res.status(500).send("Error al crear el cambio");
                                                 else {
                                                     res.status(201).send(voteCreado.ops[0]);
                                                 }
@@ -133,7 +133,7 @@ exports.updateVote = function (req, res) {
     var VoteModel = db.model('votes', Vote.schema)
 
     if (req.body.value == undefined) {
-        res.status(400).send("El campo end_date es obligatorio");
+        res.status(400).send("El campo value es obligatorio y ha de ser un entero");
     } else {
         PollModel.findOne({ _id: req.params.idPoll }).exec(function (err, doc) {
             if (err) {
@@ -155,7 +155,7 @@ exports.updateVote = function (req, res) {
                         db.collection('changes').insertOne(change, function (err, changeCreado) {
                             TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
                                 if (err)
-                                    res.status(500).send("Error al crear la tarea");
+                                    res.status(500).send("Error al crear el cambio");
                                 else {
                                     res.status(204).send(voteActualizado);
                                 }
@@ -196,7 +196,7 @@ exports.deleteVote = function (req, res) {
                     db.collection('changes').insertOne(change, function (err, changeCreado) {
                         TaskModel.findOneAndUpdate({ _id: req.params.idTask }, { $push: { changes: changeCreado.ops[0]._id } }).exec(function (err, taskActualizada) {
                             if (err)
-                                res.status(500).send("Error al crear la tarea");
+                                res.status(500).send("Error al crear el cambio");
                             else {
                                 res.status(201).send("Borrado");
                             }
