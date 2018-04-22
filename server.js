@@ -89,8 +89,8 @@ router.delete('/users/:username/roles/:name', middleware.ensureAuthenticated,mid
 //Crear sprint
 router.post('/users/:username/projects/:idProject/sprints', middleware.ensureAuthenticated, middleware.comprobarToken,middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.newSprint);
 //Listar sprints de proyecto. 
-router.get('/users/:username/projects/:idProject/sprints', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprints);
-router.get('/users/:username/projects/:idProject/sprints/:idSprint', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.getSprint);
+router.get('/users/:username/projects/:idProject/sprints', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject,sprintController.getSprints);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject,sprintController.getSprint);
 //Actualizar información de un proyecto en concreto. 
 router.put('/users/:username/projects/:idProject/sprints/:idSprint', middleware.ensureAuthenticated, middleware.comprobarToken,middleware.participaProject, middleware.comprobarPermisoJefe,sprintController.updateSprint);
 //Borrar Proyecto
@@ -102,8 +102,8 @@ router.delete('/users/:username/projects/:idProject/sprints/:idSprint', middlewa
 //Crear status
 router.post('/users/:username/projects/:idProject/sprints/:idSprint/status', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.newStatus);
 //Listar status de sprints. 
-router.get('/users/:username/projects/:idProject/sprints/:idSprint/status', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getAllStatus);
-router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.getStatus);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject,statusController.getAllStatus);
+router.get('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject,statusController.getStatus);
 //Actualizar información de un status en concreto. 
 router.put('/users/:username/projects/:idProject/sprints/:idSprint/status/:idStatus', middleware.ensureAuthenticated,middleware.comprobarToken, middleware.participaProject, middleware.comprobarPermisoJefe,statusController.updateStatus);
 /**************************************************************************************************************************************/
