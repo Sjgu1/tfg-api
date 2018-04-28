@@ -64,6 +64,7 @@ exports.updateUser = function (req, res) {
                 username: req.body.username,
                 password: req.body.password,
                 email: req.body.email,
+                avatar: req.body.avatar,
                 admin: false,
                 created_at: new Date(),
                 updated_at: new Date()
@@ -98,6 +99,7 @@ exports.updateUser = function (req, res) {
                                             surname: user.surname,
                                             username: user.username,
                                             email: user.email,
+                                            avatar: user.avatar,
                                             updated_at: new Date()
                                         }
                                     }
