@@ -14,6 +14,7 @@ exports.emailSignup = function (req, res) {
         password: req.body.password,
         email: req.body.email,
         admin: false,
+        avatar: "avatar_051",
         created_at: new Date(),
         updated_at: new Date()
     });
