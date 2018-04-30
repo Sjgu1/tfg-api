@@ -48,7 +48,7 @@ router.delete('/users/:username', middleware.ensureAuthenticated,middleware.comp
 
 //Busqueda de usuarios
 router.get('/users/search/:username', userController.searchUser);
-router.get('/users',middleware.ensureAuthenticated,middleware.comprobarToken, userController.getAllUsers);
+router.get('/users', userController.getAllUsers);
 
 /**************************************************************************************************************************************/
 
