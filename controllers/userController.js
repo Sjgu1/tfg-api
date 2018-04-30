@@ -38,6 +38,19 @@ exports.searchUser = function (req, res) {
     });
 }
 
+exports.getAllUsers = function (req, res) {
+
+    UserModel.find().exec(function (err, doc) {
+        if (err) {
+            return res.status(500).send("Error servidor")
+        } else if (!doc) {
+            res.status(404).send("No existe el usuario.");
+        } else {
+            return res.status(200).send(doc)
+        }
+    });
+}
+
 exports.deleteUser = function (req, res) {
     db.collection('users').findOne({ username: req.params.username }, function (err, doc) {
         if (!doc) {
