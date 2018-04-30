@@ -41,7 +41,7 @@ exports.searchUser = function (req, res) {
 exports.getAllUsers = function (req, res) {
     var UserModel = db.model('users', User.schema)
 
-    UserModel.find().exec(function (err, doc) {
+    UserModel.find({},{'username': 1, 'avatar': 1}).exec(function (err, doc) {
         if (err) {
             return res.status(500).send("Error servidor")
         } else {
