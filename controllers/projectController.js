@@ -362,8 +362,6 @@ exports.updateProject = function (req, res) {
                                                     name: project.name,
                                                     description: project.description,
                                                     repository: project.repository,
-                                                    start_date: project.start_date,
-                                                    end_date: project.end_date,
                                                     updated_at: new Date()
                                                 }
                                             }
@@ -373,8 +371,6 @@ exports.updateProject = function (req, res) {
                                                     name: project.name,
                                                     description: project.description,
                                                     repository: project.repository,
-                                                    start_date: project.start_date,
-                                                    end_date: project.end_date,
                                                     updated_at: new Date()
                                                 }
                                             }
