@@ -16,6 +16,7 @@
     "cors": "^2.8.4",
     "expect": "^22.4.3",
     "express": "^4.16.3",
+    "input-is": "^1.1.2",
     "is-valid-date": "0.0.1",
     "jwt-simple": "^0.5.1",
     "mocha": "^5.0.5",

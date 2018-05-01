@@ -7,7 +7,7 @@ var validator = require('validator');
 var Permission = require('../models/permission')
 var Role = require('../models/role')
 var ObjectId = require('mongoose').Types.ObjectId;
-var isValidDate = require('is-valid-date')
+var isValidDate = require('input-is')
 
 
 exports.newProject = function (req, res) {
@@ -24,9 +24,9 @@ exports.newProject = function (req, res) {
         updated_at: new Date()
     });
     //Se comprueba los campos obligatorios
-    if (isValidDate(req.body.start_date))
+    if (isValidDate.date(req.body.start_date))
         project.start_date = req.body.start_date
-    if (isValidDate(req.body.estimated_end))
+    if (isValidDate.date(req.body.estimated_end))
         project.estimated_end = req.body.estimated_end
     
     if (req.body.repository == undefined || req.body.name == undefined) {
@@ -379,11 +379,11 @@ exports.updateProject = function (req, res) {
                                             }
                                         }
 
-                                        if (isValidDate(project.end_date))
+                                        if (isValidDate.date(project.end_date))
                                             datos_a_actualizar.$set.end_date = project.end_date
-                                        if (isValidDate(project.start_date))
+                                        if (isValidDate.date(project.start_date))
                                             datos_a_actualizar.$set.start_date = project.start_date
-                                        if (isValidDate(project.estimated_end))
+                                        if (isValidDate.date(project.estimated_end))
                                             datos_a_actualizar.$set.estimated_end = project.estimated_end
                                         var query = { _id: new ObjectId(req.params.idProject) };
 
