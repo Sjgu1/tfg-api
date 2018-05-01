@@ -7,6 +7,7 @@ var validator = require('validator');
 var Permission = require('../models/permission')
 var Role = require('../models/role')
 var ObjectId = require('mongoose').Types.ObjectId;
+var isValidDate = require('is-valid-date')
 
 
 exports.newProject = function (req, res) {
@@ -17,15 +18,17 @@ exports.newProject = function (req, res) {
         name: req.body.name,
         description: req.body.description,
         repository: req.body.repository,
-        start_date: req.body.start_date,
-        estimated_end: req.body.estimated_end,
         users: [],
-        sprints:[],
+        sprints: [],
         created_at: new Date(),
         updated_at: new Date()
     });
     //Se comprueba los campos obligatorios
-
+    if (isValidDate(req.body.start_date))
+        project.start_date = req.body.start_date
+    if (isValidDate(req.body.estimated_end))
+        project.estimated_end = req.body.estimated_end
+    
     if (req.body.repository == undefined || req.body.name == undefined) {
         res.status(400).send("Los campos name y repository son obligatorios");
         //Se comprueba que el repositorio es una url
@@ -376,6 +379,12 @@ exports.updateProject = function (req, res) {
                                             }
                                         }
 
+                                        if (isValidDate(project.end_date))
+                                            datos_a_actualizar.$set.end_date = project.end_date
+                                        if (isValidDate(project.start_date))
+                                            datos_a_actualizar.$set.start_date = project.start_date
+                                        if (isValidDate(project.estimated_end))
+                                            datos_a_actualizar.$set.estimated_end = project.estimated_end
                                         var query = { _id: new ObjectId(req.params.idProject) };
 
                                         db.collection('projects').findOneAndUpdate(query, datos_a_actualizar, function (err, proyecto) {
