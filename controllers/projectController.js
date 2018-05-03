@@ -189,6 +189,7 @@ exports.deleteProject = function (req, res) {
     });
 }
 exports.updateProject = function (req, res) {
+
     var agregarUsuario = true;
     if (req.body.operation == "UpdateRole") {
         var UserModel = db.model('users', User.schema);
