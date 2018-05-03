@@ -28,7 +28,7 @@ exports.newProject = function (req, res) {
         project.start_date = req.body.start_date
     if (isValidDate.date(req.body.estimated_end))
         project.estimated_end = req.body.estimated_end
-    
+
     if (req.body.repository == undefined || req.body.name == undefined) {
         res.status(400).send("Los campos name y repository son obligatorios");
         //Se comprueba que el repositorio es una url
@@ -282,7 +282,6 @@ exports.updateProject = function (req, res) {
         })
 
     } else {
-
         if (req.body.users) {
             var project = {
                 name: req.body.name,
@@ -331,7 +330,7 @@ exports.updateProject = function (req, res) {
                             pertenece = true;
                         }
                     }
-                    if (pertenece) {
+                    if (pertenece && agregarUsuario) {
                         //comprobar si se quiere agregar usuario y si existe ese usuario
                         db.collection('users').findOne({ username: project.users.user }, function (err, usuarioInvitado) {
                             if (!usuarioInvitado && agregarUsuario) {
@@ -418,10 +417,38 @@ exports.updateProject = function (req, res) {
                             });
                         })
                     } else {
-                        return res.status(404).send("El proyecto o no existe o no tiene acceso el usuario conectado")
+                        var datos_a_actualizar = {
+                            $set: {
+                                name: project.name,
+                                description: project.description,
+                                repository: project.repository,
+                                updated_at: new Date()
+                            }
+                        }
+
+
+                        if (isValidDate.date(project.end_date))
+                            datos_a_actualizar.$set.end_date = project.end_date
+                        if (isValidDate.date(project.start_date))
+                            datos_a_actualizar.$set.start_date = project.start_date
+                        if (isValidDate.date(project.estimated_end))
+                            datos_a_actualizar.$set.estimated_end = project.estimated_end
+                        var query = { _id: new ObjectId(req.params.idProject) };
+
+                        db.collection('projects').findOneAndUpdate(query, datos_a_actualizar, function (err, proyecto) {
+                            if (err) {
+                                res.status(500).send("Error al conseguir los proyectos.");
+                            } else if (proyecto == null) {
+                                res.status(500).send("No existe el proyecto");
+                            } else {
+                                return res.status(204).send("Se ha actualizado")
+                            }
+
+                        });
+
                     }
                 }
-            });
+            })
         }
     }
 }
