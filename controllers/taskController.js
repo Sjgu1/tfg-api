@@ -505,7 +505,13 @@ exports.deleteTask = function (req, res) {
                 if (err)
                     return res.status(500).send("Error al conseguir el sprint.");
                 else {
-                    return res.status(201).send("borrado")
+                    StatusModel.findOneAndUpdate({ _id: req.params.idStatus }, { $pull: { 'tasks': ObjectId(req.params.idTask) }, $set: { updated_at: new Date() } }).exec(function (err, doc) {
+                        if (err)
+                            return res.status(500).send("Error al actualizar los proyectos.");
+                        else
+                            return res.status(201).send("borrado")
+
+                    })
                 }
             });
         } else {
