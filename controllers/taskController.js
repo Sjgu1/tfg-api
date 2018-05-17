@@ -358,7 +358,7 @@ exports.updateTask = function (req, res) {
                                                             res.status(500).send("Error al agregar tarea al status")
                                                         } else {
                                                             var change = new Change({
-                                                                message: req.params.username + "ha cambiado el estado de la tarea de " + docStatus.name + " a " + newState.name + ".",
+                                                                message: req.params.username + " ha cambiado el estado de la tarea de " + docStatus.name + " a " + newState.name + ".",
                                                                 created_at: new Date()
                                                             });
                                                             db.collection('changes').insertOne(change, function (err, changeCreado) {
@@ -430,7 +430,7 @@ exports.updateTask = function (req, res) {
                             if (err) {
                                 return res.status(500).send("Error al actualizar la tarea.");
                             } else {
-                                var cambios = "El usuario a realizado las siguientes modificaciones: \n\n"
+                                var cambios = "El usuario ha realizado las siguientes modificaciones: \n\n"
                                 if (req.body.name != undefined && req.body.name != taskActualizada.name)
                                     cambios += "Nombre anterior: " + taskActualizada.name + ".\nNuevo nombre: " + req.body.name + ". \n\n"
                                 if (req.body.description != undefined && req.body.description != taskActualizada.description)
@@ -444,7 +444,7 @@ exports.updateTask = function (req, res) {
                                 if (req.body.end_date != undefined && req.body.end_date != taskActualizada.end_date)
                                     cambios += "Fecha de finalización anterior: " + taskActualizada.end_date + ".\nNueva fecha de finalización: " + req.body.end_date + ". \n\n"
 
-                                if (cambios != "El usuario a realizado las siguientes modificaciones: \n\n") {
+                                if (cambios != "El usuario ha realizado las siguientes modificaciones: \n\n") {
                                     var change = new Change({
                                         message: cambios,
                                         created_at: new Date()
