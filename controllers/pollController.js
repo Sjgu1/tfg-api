@@ -76,14 +76,16 @@ exports.getPoll = function (req, res) {
             res.status(404).send("No existe la tarea")
         } else {
             var query = { _id: new ObjectId(req.params.idPoll) };
-            PollModel.findOne(query).populate('votes').exec(function (err, pollEncontrada) {
+            PollModel.findOne(query).populate('votes').populate('votes.user').exec(function (err, pollEncontrada) {
                 if (err) {
                     res.status(500).send("Error al conseguir la votación.");
                 } else if (pollEncontrada == null) {
                     res.status(404).send("No se ha encontrado la votación");
                 }
-                else
+                else{
                     res.status(200).send(pollEncontrada);
+
+                }
             });
         }
     })

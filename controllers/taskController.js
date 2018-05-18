@@ -10,6 +10,8 @@ var ObjectId = require('mongoose').Types.ObjectId;
 var Status = require('../models/status');
 var Task = require('../models/task');
 var Change = require('../models/change');
+var isValidDate = require('input-is')
+
 
 exports.newTask = function (req, res) {
     var ProjectModel = db.model('projects', Project.schema)
@@ -21,8 +23,6 @@ exports.newTask = function (req, res) {
     var task = new Task({
         name: req.body.name,
         description: req.body.description,
-        start_date: req.body.start_date,
-        estimated_end: req.body.estimated_end,
         color: req.body.color,
         users: [],
         changes: [],
@@ -30,6 +30,11 @@ exports.newTask = function (req, res) {
         created_at: new Date(),
         updated_at: new Date()
     });
+
+    if (isValidDate.date(req.body.start_date))
+        task.start_date = req.body.start_date
+    if (isValidDate.date(req.body.estimated_end))
+        task.estimated_end = req.body.estimated_end
 
     //Se comprueba los campos obligatorios
     if (req.body.name == undefined) {
@@ -399,13 +404,17 @@ exports.updateTask = function (req, res) {
             $set: {
                 name: req.body.name,
                 description: req.body.description,
-                start_date: req.body.start_date,
-                end_date: req.body.end_date,
-                estimated_end: req.body.estimated_end,
                 color: req.body.color,
                 updated_at: new Date()
             }
         };
+
+        if (isValidDate.date(req.body.end_date))
+        datos_a_actualizar.$set.end_date = req.body.end_date
+        if (isValidDate.date(req.body.start_date))
+        datos_a_actualizar.$set.start_date = req.body.start_date
+        if (isValidDate.date(req.body.estimated_end))
+        datos_a_actualizar.$set.estimated_end = req.body.estimated_end
         if (req.body.name == undefined) {
             return res.status(400).send("El nombre es obligatorio")
         } else {
